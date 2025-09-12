@@ -1,0 +1,31 @@
+{
+  "parameters": {
+    "id": "number",
+    "groupId": "number",
+    "name": "string",
+    "gocbRef": "string",
+    "timestamp": "number",
+    "function": [
+      "PUBLISHER",
+      "SUBSCRIBER"
+    ],
+    "datSet": "string",
+    "stNum": "number",
+    "sqNum": "number",
+    "sourceAdress": "string",
+    "addLegitimateMessages": "boolean"
+  },
+  "defaultValues": {
+    "id": 1,
+    "name": "defaultIED",
+    "gocbRef": "LD/LLN0$GO$gcbA",
+    "datSet": "LD/LLN0$IntLockA",
+    "timestamp": 0,
+    "stNum": 1,
+    "sqNum": 1,
+    "sourceAdress": "02:0A:AC:12:34:56",
+    "function": ["SUBSCRIBER"],
+    "groupId": null,
+    "addLegitimateMessages": true
+  }
+}
