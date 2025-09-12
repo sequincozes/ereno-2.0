@@ -1,27 +1,20 @@
-import { Shield as IconShield, Group as IconGroup, Server as IconServer } from 'lucide-react';
+import { Group as IconGroup, Server as IconServer } from 'lucide-react';
+import Header from '../../components/common/Header';
 import IedForm from './IedForm';
 import GroupForm from './GroupForm';
 import { useState } from 'react';
 
-
 export default function IedConfig() {
   const [showIedForm, setShowIedForm] = useState(false);
   const [showGroupForm, setShowGroupForm] = useState(false);
+
+  // just to test the move of pages
+  const moveToNextPage = () => {
+    window.location.href = '/attackConfig';
+  }
   return (
     <main className="min-h-screen  bg-[#ECF0FF] flex flex-col">
-      {/* Header */}
-        <header className="bg-[#ECF0FF] p-6">
-            <div className="flex flex-col items-start">
-                <span className="flex items-center gap-2 text-[#0051A2] font-bold px-4 py-2 rounded-md text-lg">
-                    <IconShield className="w-5 h-5"/>
-                    ERENO-UI
-                </span>
-                <h2 className="text-[#007AF0] font-bold  mt-4">
-                    Dataset Generation System with cyberattacks in GOOSE protocol
-                </h2>
-            </div>
-        </header>
-
+      <Header />
 
       {/* Stepper */}
       <div className="flex justify-between items-center px-16 py-8 text-sm font-medium">
@@ -74,7 +67,8 @@ export default function IedConfig() {
 
       {/* Footer */}
       <footer className="flex justify-end px-8 py-6">
-        <button className="bg-blue-500 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded">
+        <button className="bg-blue-500 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded"
+        onClick={moveToNextPage}>
           Next &gt;
         </button>
       </footer>
