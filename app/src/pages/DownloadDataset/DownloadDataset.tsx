@@ -2,16 +2,14 @@ import Header from "../../components/common/Header";
 import { Target as IconTarget } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import Modal from "../../components/feedback/Modal"
 
 export default function DowloadDataset() {
 
+    const [showModal, setShowModal] = useState(false);
     const [fileFormat, setFileFormat] = useState(".CSV");
     const [goose, setGoose] = useState(true);
     const [sv, setSv] = useState(false);
-
-    const showPopUpDataset = () => {
-        //TODO implement
-    }
 
     const moveToLastPage = () => {
         window.location.href = '/attackConfig';
@@ -85,9 +83,10 @@ export default function DowloadDataset() {
                     &lt; Previous
                 </button>
                 <button className="border border-blue-800 bg-blue-500 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded"
-                    onClick={showPopUpDataset}>
+                    onClick={setShowModal}>
                     Finish
                 </button>
+                {showModal && <Modal title="Dataset Created!" content="The dataset will be created." />}
             </footer>
         </main>
     );

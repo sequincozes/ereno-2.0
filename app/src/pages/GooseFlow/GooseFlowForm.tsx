@@ -4,8 +4,6 @@ import gooseData from "../../data/goose.json";
 export default function GooseFlowForm() {
   const { parameters, defaultValues } = gooseData;
   const [formValues, setFormValues] = useState(defaultValues);
-  const [CheckboxValue, setCheckboxValue] = useState(true);
-
 
   const handleChange = (field: string, value: any) => {
     setFormValues(prev => ({ ...prev, [field]: value }));

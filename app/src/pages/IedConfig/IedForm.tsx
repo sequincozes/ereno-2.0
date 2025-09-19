@@ -40,7 +40,7 @@ export default function IedForm() {
                 <button
                   type="button"
                   onClick={() => navigator.clipboard.writeText(key)}
-                  className="ml-2 px-2 py-1 bg-blue-500 text-white rounded"
+                  className="ml-auto p-2 rounded border border-blue-300 bg-blue-100 text-blue-600 hover:bg-blue-200"
                   title="Copiar"
                 >
                   <IconCopy size={24}/>
@@ -48,7 +48,7 @@ export default function IedForm() {
                 <button
                   type="button"
                   onClick={() => handleDelete(key)}
-                  className="ml-2 px-2 py-1 bg-red-500 text-white rounded border-[#F02532]"
+                  className="ml-auto p-2 rounded border border-red-300 bg-red-100 text-red-600 hover:bg-red-200"
                   title="Excluir"
                 >
                   <IconTrash size={24} />

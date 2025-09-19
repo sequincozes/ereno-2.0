@@ -2,7 +2,7 @@ import { Route, BrowserRouter, Routes } from "react-router-dom";
 import Iedconfig from "./pages/IedConfig/Iedconfig";
 import GooseFlow from './pages/GooseFlow/GooseFlow';
 import AttackConfig from './pages/AttackConfig/AttackConfig';
-import DownloadDataset from './pages/DownloadDataset/DowloadDataset';
+import DownloadDataset from './pages/DownloadDataset/DownloadDataset';
 import UploadCurrentFile from "./pages/IedConfig/UploadCurrentFile";
 
 function App() {

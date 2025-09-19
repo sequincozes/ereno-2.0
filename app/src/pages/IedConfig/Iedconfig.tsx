@@ -9,7 +9,6 @@ export default function IedConfig() {
   const [showIedForm, setShowIedForm] = useState(false);
   const [showGroupForm, setShowGroupForm] = useState(false);
 
-  // just to test the move of pages
   const moveToNextPage = () => {
     window.location.href = '/UploadCurrentFile';
   }
