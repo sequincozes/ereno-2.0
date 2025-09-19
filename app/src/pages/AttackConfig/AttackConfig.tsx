@@ -5,8 +5,7 @@ import { Link } from "react-router-dom";
 import AttackForm from "./AttackConfigForm";
 
 export default function AttackConfig() {
-    const [showAttackForm, setShowAttackForm] = useState(false);
-
+    const [attackForms, setAttackForms] = useState([0]);
 
     const moveToLastPage = () => {
         window.location.href = '/gooseFlow';
@@ -15,6 +14,14 @@ export default function AttackConfig() {
     const moveToNextPage = () => {
         window.location.href = '/downloadDataset';
     }
+
+    const handleAddAttack = () => {
+        setAttackForms(prev => [...prev, prev.length]);
+    };
+
+    const handleDeleteAttack = (idx: number) => {
+        setAttackForms(prev => prev.filter((_, i) => i !== idx));
+    };
 
     return(
         <main className="min-h-screen bg-[#ECF0FF] flex flex-col">
@@ -30,7 +37,7 @@ export default function AttackConfig() {
             <hr className="border border-gray-200" />
 
             {/* Content */}
-            <div className="flex px-8 py-6 flex flex-col">
+            <div className="flex px-8 py-6 flex-col">
                 <div className="bg-white rounded-md shadow p-6">
                     <h3 className="flex items-center gap-2 text-[#0051A2] text-lg mb-1 font-bold">
                         <IconTarget className="w-5 h-5"/>
@@ -40,12 +47,12 @@ export default function AttackConfig() {
                         Select the attack type for the IEDs
                     </p>
                     <button className="bg-blue-500 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded mb-4"
-                        onClick={() => setShowAttackForm(true)}>
+                        onClick={handleAddAttack}>
                         + Add Attack
                     </button>
-                    {showAttackForm && (
-                        <AttackForm />
-                    )}
+                    {attackForms.map((_, idx) => (
+                        <AttackForm key={idx} attackIndex={idx} onDelete={() => handleDeleteAttack(idx)} />
+                    ))}
                 </div>
             </div>
 

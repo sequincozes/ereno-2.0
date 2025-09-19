@@ -4,7 +4,12 @@ import attackData from "../../data/attacks.json";
 import { Trash2 as IconTrash } from "lucide-react";
 import { useFloating, autoUpdate, offset, flip, shift, useHover, useFocus, useDismiss, useRole, useInteractions } from '@floating-ui/react';
 
-export default function AttackForm() {
+interface AttackFormProps {
+  attackIndex: number;
+  onDelete: () => void;
+}
+
+export default function AttackForm({ attackIndex, onDelete }: AttackFormProps) {
   const compromisedGroups = attackData.iedConfiguration.compromisedIED;
   const attackCategories = Object.keys(attackData.attacks);
 
@@ -54,8 +59,8 @@ export default function AttackForm() {
     <div className="border border-blue-500 rounded-xl p-6 mt-4">
       <div className="flex items-center gap-4 mb-4">
         <input type="checkbox" checked={true} className="accent-black" readOnly />
-        <input type="text" value={"Ataque 1"} className="border rounded px-3 py-2 bg-white" readOnly />
-        <button className="ml-auto p-2 rounded border border-red-300 bg-red-100 text-red-600 hover:bg-red-200" onClick={() => handleDelete("attack")}>
+        <input type="text" value={`Ataque ${attackIndex + 1}`} className="border rounded px-3 py-2 bg-white" readOnly />
+        <button className="ml-auto p-2 rounded border border-red-300 bg-red-100 text-red-600 hover:bg-red-200" onClick={onDelete}>
           <IconTrash size={20} />
         </button>
       </div>
