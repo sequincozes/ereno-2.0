@@ -5,12 +5,10 @@ import { FileUpload } from '@skeletonlabs/skeleton-react';
 
 export default function IedConfig() {
 
-    // just to test the move of pages
     const moveToLastPage = () => {
         window.location.href = '/';
     }
 
-    // just to test the move of pages
     const moveToNextPage = () => {
         window.location.href = '/gooseFlow';
     }

@@ -9,13 +9,12 @@ export default function DowloadDataset() {
     const [goose, setGoose] = useState(true);
     const [sv, setSv] = useState(false);
 
-    // just to test the move of pages
-    const moveToNextPage = () => {
-        window.location.href = '/attackConfig';
+    const showPopUpDataset = () => {
+        //TODO implement
     }
 
     const moveToLastPage = () => {
-        window.location.href = '/iedConfig';
+        window.location.href = '/attackConfig';
     }
 
     const fileFormats = [".CSV", ".PCAP", ".ARFF"];
@@ -83,11 +82,11 @@ export default function DowloadDataset() {
             <footer className="flex px-8 justify-between">
                 <button className="border border-gray-800 bg-gray-500 hover:bg-gray-700 text-white font-medium px-6 py-2 rounded"
                     onClick={moveToLastPage}>
-                    Previous &gt;
+                    &lt; Previous
                 </button>
                 <button className="border border-blue-800 bg-blue-500 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded"
-                    onClick={moveToNextPage}>
-                    Next &gt;
+                    onClick={showPopUpDataset}>
+                    Finish
                 </button>
             </footer>
         </main>

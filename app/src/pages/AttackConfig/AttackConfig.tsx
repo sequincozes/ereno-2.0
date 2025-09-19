@@ -7,7 +7,11 @@ import AttackForm from "./AttackConfigForm";
 export default function AttackConfig() {
     const [showAttackForm, setShowAttackForm] = useState(false);
 
-    // just to test the move of pages
+
+    const moveToLastPage = () => {
+        window.location.href = '/gooseFlow';
+    }
+
     const moveToNextPage = () => {
         window.location.href = '/downloadDataset';
     }
@@ -26,7 +30,7 @@ export default function AttackConfig() {
             <hr className="border border-gray-200" />
 
             {/* Content */}
-            <div className="flex-1 px-8 py-6 flex flex-col gap-6">
+            <div className="flex px-8 py-6 flex flex-col">
                 <div className="bg-white rounded-md shadow p-6">
                     <h3 className="flex items-center gap-2 text-[#0051A2] text-lg mb-1 font-bold">
                         <IconTarget className="w-5 h-5"/>
@@ -44,11 +48,16 @@ export default function AttackConfig() {
                     )}
                 </div>
             </div>
+
             {/* Footer */}
-            <footer className="flex justify-end px-8 py-6">
-                <button className="bg-blue-500 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded"
+            <footer className="flex px-8 justify-between">
+                <button className="border border-gray-800 bg-gray-500 hover:bg-gray-700 text-white font-medium px-6 py-2 rounded"
+                onClick={moveToLastPage}>
+                    &lt; Previous
+                </button>
+                <button className="border border-blue-800 bg-blue-500 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded"
                 onClick={moveToNextPage}>
-                Next &gt;
+                    Next &gt;
                 </button>
             </footer>
         </main>

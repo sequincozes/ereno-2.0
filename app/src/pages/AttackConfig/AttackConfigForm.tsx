@@ -4,30 +4,24 @@ import attackData from "../../data/attacks.json";
 import { Trash2 as IconTrash } from "lucide-react";
 
 export default function AttackForm() {
-  // Extrai dados do JSON
   const compromisedGroups = attackData.iedConfiguration.compromisedIED;
   const attackCategories = Object.keys(attackData.attacks);
 
-  // Estados para seleção
   const [selectedGroup, setSelectedGroup] = useState(compromisedGroups[0] || "");
   const [selectedCategory, setSelectedCategory] = useState(attackCategories[0] || "");
   const [selectedAttack, setSelectedAttack] = useState("");
 
-  // Atualiza ataques específicos ao mudar categoria
   const specificAttacks = selectedCategory ? Object.keys(attackData.attacks[selectedCategory]) : [];
   const attackParams = selectedCategory && selectedAttack
     ? attackData.attacks[selectedCategory][selectedAttack]?.parameters || []
     : [];
 
-  // Estado dos parâmetros
   const [paramValues, setParamValues] = useState({});
 
-  // Atualiza valor de parâmetro
   const handleParamChange = (name, value) => {
     setParamValues(prev => ({ ...prev, [name]: value }));
   };
 
-  // Renderização
   return (
     <div className="border border-red-300 bg-red-50 rounded-xl p-6 mt-4">
       <div className="flex items-center gap-4 mb-4">
@@ -39,7 +33,7 @@ export default function AttackForm() {
       </div>
       <hr className="my-4 border-red-200" />
       <div className="flex flex-col gap-4">
-        {/* Grupo Alvo */}
+        {/* Target Group */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Grupo Alvo</label>
           <select
@@ -52,7 +46,7 @@ export default function AttackForm() {
             ))}
           </select>
         </div>
-        {/* Categoria do Ataque */}
+        {/* Attack Category */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Categoria do Ataque</label>
           <select
@@ -68,9 +62,9 @@ export default function AttackForm() {
             ))}
           </select>
         </div>
-        {/* Ataque Específico */}
+        {/* Specific Attack */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Ataque Específico</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Especific Attack</label>
           <span className="text-xs text-gray-500 mb-1 block">{selectedAttack ? "" : "Selecione o ataque específico"}</span>
           <select
             value={selectedAttack}
@@ -83,7 +77,7 @@ export default function AttackForm() {
             ))}
           </select>
         </div>
-        {/* Parâmetros Dinâmicos */}
+        {/* Dinamic Parameters */}
         {attackParams.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
             {attackParams.map(param => (

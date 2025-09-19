@@ -11,7 +11,7 @@ export default function IedConfig() {
 
   // just to test the move of pages
   const moveToNextPage = () => {
-    window.location.href = '/attackConfig';
+    window.location.href = '/UploadCurrentFile';
   }
   return (
     <main className="min-h-screen  bg-[#ECF0FF] flex flex-col">
@@ -68,8 +68,8 @@ export default function IedConfig() {
 
       {/* Footer */}
       <footer className="flex justify-end px-8 py-6">
-        <button className="bg-blue-500 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded"
-        onClick={moveToNextPage}>
+        <button className="border border-blue-800 bg-blue-500 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded"
+          onClick={moveToNextPage}>
           Next &gt;
         </button>
       </footer>
