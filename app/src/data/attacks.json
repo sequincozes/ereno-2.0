@@ -1,0 +1,71 @@
+{
+  "attacks": {
+    "DoS": {
+      "Grayhole": {
+        "parameters": [
+          {
+            "name": "toDiscardPacket",
+            "hint": "Number of packets that will be discarded",
+            "type": "int",
+            "defaultValue": 10
+          },
+          {
+            "name": "discardRate",
+            "hint": "Chance of each packet to be discarded",
+            "type": "int",
+            "defaultValue": 50
+          }
+        ]
+      },
+      "OrientedGrayhole": {
+        "parameters": [
+          {
+            "name": "toDiscardPacket",
+            "hint": "Number of packets that will be discarded",
+            "type": "int",
+            "defaultValue": 10
+          },
+          {
+            "name": "discardRate",
+            "hint": "Chance of each packet to be discarded",
+            "type": "int",
+            "defaultValue": 50
+          },
+          {
+            "name": "approach",
+            "hint": "Approach of the attack",
+            "type": [
+              "RANDOMIC_MESSAGE",
+              "RANDOMIC_BURST",
+              "DETERMINISTIC_BURST",
+              "FULL_RANDOMIC"
+            ],
+            "defaultValue": "RANDOMIC_MESSAGE"
+          }
+        ]
+      }
+    },
+    "Replay": {
+      "RandomReplay": {
+        "parameters": [
+          {
+            "name": "nParameter",
+            "hint": "N-esimo parametro",
+            "type": "string",
+            "defaultValue": "Default"
+          },
+          {
+            "name": "discardRate",
+            "hint": "Chance of each packet to be discarded",
+            "type": "int",
+            "defaultValue": 50
+          }
+        ]
+      }
+    }
+  },
+  "iedConfiguration": {
+    "compromisedIED": ["IED01", "IED02", "IED03", "GROUP01", "GROUP02"],
+    "victimIED": ["IED01", "IED02", "IED03", "GROUP01", "GROUP02"]
+  }
+}

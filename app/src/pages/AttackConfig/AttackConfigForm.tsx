@@ -1,0 +1,118 @@
+
+import { useState } from "react";
+import attackData from "../../data/attacks.json";
+import { Trash2 as IconTrash } from "lucide-react";
+
+export default function AttackForm() {
+  // Extrai dados do JSON
+  const compromisedGroups = attackData.iedConfiguration.compromisedIED;
+  const attackCategories = Object.keys(attackData.attacks);
+
+  // Estados para seleção
+  const [selectedGroup, setSelectedGroup] = useState(compromisedGroups[0] || "");
+  const [selectedCategory, setSelectedCategory] = useState(attackCategories[0] || "");
+  const [selectedAttack, setSelectedAttack] = useState("");
+
+  // Atualiza ataques específicos ao mudar categoria
+  const specificAttacks = selectedCategory ? Object.keys(attackData.attacks[selectedCategory]) : [];
+  const attackParams = selectedCategory && selectedAttack
+    ? attackData.attacks[selectedCategory][selectedAttack]?.parameters || []
+    : [];
+
+  // Estado dos parâmetros
+  const [paramValues, setParamValues] = useState({});
+
+  // Atualiza valor de parâmetro
+  const handleParamChange = (name, value) => {
+    setParamValues(prev => ({ ...prev, [name]: value }));
+  };
+
+  // Renderização
+  return (
+    <div className="border border-red-300 bg-red-50 rounded-xl p-6 mt-4">
+      <div className="flex items-center gap-4 mb-4">
+        <input type="checkbox" checked={true} className="accent-black" readOnly />
+        <input type="text" value={"Ataque 1"} className="border rounded px-3 py-2 bg-white" readOnly />
+        <button className="ml-auto p-2 rounded border border-red-300 bg-red-100 text-red-600 hover:bg-red-200">
+          <IconTrash size={20} />
+        </button>
+      </div>
+      <hr className="my-4 border-red-200" />
+      <div className="flex flex-col gap-4">
+        {/* Grupo Alvo */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Grupo Alvo</label>
+          <select
+            value={selectedGroup}
+            onChange={e => setSelectedGroup(e.target.value)}
+            className="w-full border rounded px-3 py-2"
+          >
+            {compromisedGroups.map(g => (
+              <option key={g} value={g}>{g}</option>
+            ))}
+          </select>
+        </div>
+        {/* Categoria do Ataque */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Categoria do Ataque</label>
+          <select
+            value={selectedCategory}
+            onChange={e => {
+              setSelectedCategory(e.target.value);
+              setSelectedAttack("");
+            }}
+            className="w-full border rounded px-3 py-2"
+          >
+            {attackCategories.map(cat => (
+              <option key={cat} value={cat}>{cat}</option>
+            ))}
+          </select>
+        </div>
+        {/* Ataque Específico */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Ataque Específico</label>
+          <span className="text-xs text-gray-500 mb-1 block">{selectedAttack ? "" : "Selecione o ataque específico"}</span>
+          <select
+            value={selectedAttack}
+            onChange={e => setSelectedAttack(e.target.value)}
+            className="w-full border rounded px-3 py-2"
+          >
+            <option value="">Selecione o ataque específico</option>
+            {specificAttacks.map(a => (
+              <option key={a} value={a}>{a}</option>
+            ))}
+          </select>
+        </div>
+        {/* Parâmetros Dinâmicos */}
+        {attackParams.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            {attackParams.map(param => (
+              <div key={param.name} className="flex flex-col">
+                <label className="text-sm font-medium text-gray-700 mb-1">{param.name}</label>
+                <span className="text-xs text-gray-500 mb-1">{param.hint}</span>
+                {Array.isArray(param.type) ? (
+                  <select
+                    value={paramValues[param.name] ?? param.defaultValue}
+                    onChange={e => handleParamChange(param.name, e.target.value)}
+                    className="border rounded px-2 py-1"
+                  >
+                    {param.type.map(opt => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    type={param.type === "int" ? "number" : "text"}
+                    value={paramValues[param.name] ?? param.defaultValue}
+                    onChange={e => handleParamChange(param.name, param.type === "int" ? Number(e.target.value) : e.target.value)}
+                    className="border rounded px-2 py-1"
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

@@ -3,6 +3,7 @@ import Header from '../../components/common/Header';
 import IedForm from './IedForm';
 import GroupForm from './GroupForm';
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 export default function IedConfig() {
   const [showIedForm, setShowIedForm] = useState(false);
@@ -19,9 +20,9 @@ export default function IedConfig() {
       {/* Stepper */}
       <div className="flex justify-between items-center px-16 py-8 text-sm font-medium">
         <span className="text-[#0051A2]">IED Config</span>
-        <span className="text-gray-600">GOOSE Flow Config</span>
-        <span className="text-gray-600">Attack Config</span>
-        <span className="text-gray-600">Download Dataset</span>
+        <Link to="/gooseFlow" className="text-gray-600 hover:underline cursor-pointer">GOOSE Flow Config</Link>
+        <Link to="/attackConfig" className="text-gray-600 hover:underline cursor-pointer">Attack Config</Link>
+        <Link to="/downloadDataset" className="text-gray-600 hover:underline cursor-pointer">Download Dataset</Link>
       </div>
       <hr className="border border-gray-200" />
 

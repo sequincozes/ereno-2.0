@@ -1,6 +1,8 @@
 import Header from "../../components/common/Header";
 import { Target as IconTarget } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
+import AttackForm from "./AttackConfigForm";
 
 export default function AttackConfig() {
     const [showAttackForm, setShowAttackForm] = useState(false);
@@ -16,10 +18,10 @@ export default function AttackConfig() {
 
             {/* Stepper */}
             <div className="flex justify-between items-center px-16 py-8 text-sm font-medium">
-                <span className="text-gray-600">IED Config</span>
-                <span className="text-gray-600">GOOSE Flow Config</span>
+                <Link to="/" className="text-gray-600 hover:underline cursor-pointer">IED Config</Link>
+                <Link to="/gooseFlow" className="text-gray-600 hover:underline cursor-pointer">GOOSE Flow Config</Link>
                 <span className="text-[#0051A2]">Attack Config</span>
-                <span className="text-gray-600">Download Dataset</span>
+                <Link to="/downloadDataset" className="text-gray-600 hover:underline cursor-pointer">Download Dataset</Link>
             </div>
             <hr className="border border-gray-200" />
 
@@ -34,9 +36,12 @@ export default function AttackConfig() {
                         Select the attack type for the IEDs
                     </p>
                     <button className="bg-blue-500 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded mb-4"
-                    onClick={() => setShowAttackForm(true)}>
+                        onClick={() => setShowAttackForm(true)}>
                         + Add Attack
                     </button>
+                    {showAttackForm && (
+                        <AttackForm />
+                    )}
                 </div>
             </div>
             {/* Footer */}

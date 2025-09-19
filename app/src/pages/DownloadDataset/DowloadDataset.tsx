@@ -1,6 +1,7 @@
 import Header from "../../components/common/Header";
 import { Target as IconTarget } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 export default function DowloadDataset() {
 
@@ -25,15 +26,15 @@ export default function DowloadDataset() {
 
             {/* Stepper */}
             <div className="flex justify-between items-center px-16 py-8 text-sm font-medium">
-                <span className="text-gray-600">IED Config</span>
-                <span className="text-gray-600">GOOSE Flow Config</span>
-                <span className="text-gray-600">Attack Config</span>
+                <Link to="/" className="text-gray-600 hover:underline cursor-pointer">IED Config</Link>
+                <Link to="/gooseFlow" className="text-gray-600 hover:underline cursor-pointer">GOOSE Flow Config</Link>
+                <Link to="/attackConfig" className="text-gray-600 hover:underline cursor-pointer">Attack Config</Link>
                 <span className="text-[#0051A2]">Download Dataset</span>
             </div>
             <hr className="border border-gray-200" />
 
             {/* Content */}
-            <div className="flex-1 px-8 py-6 flex flex-col gap-6">
+            <div className="px-8 py-6 flex flex-col">
                 <div className="bg-white rounded-md shadow p-6">
                     <h3 className="flex items-center gap-2 text-[#0051A2] text-lg mb-1 font-bold">
                         <IconTarget className="w-5 h-5"/>
@@ -79,19 +80,15 @@ export default function DowloadDataset() {
                 </div>
             </div>
             {/* Footer */}
-            <footer className="flex px-8 py-6">
-                <div className="justify-start">
-                    <button className="border border-gray-800 bg-gray-500 hover:bg-gray-700 text-white font-medium px-6 py-2 rounded"
+            <footer className="flex px-8 justify-between">
+                <button className="border border-gray-800 bg-gray-500 hover:bg-gray-700 text-white font-medium px-6 py-2 rounded"
                     onClick={moveToLastPage}>
                     Previous &gt;
-                    </button>
-                </div>
-                <div className="justify-end">
-                    <button className="border border-blue-800 bg-blue-500 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded"
+                </button>
+                <button className="border border-blue-800 bg-blue-500 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded"
                     onClick={moveToNextPage}>
                     Next &gt;
-                    </button>
-                </div>
+                </button>
             </footer>
         </main>
     );
