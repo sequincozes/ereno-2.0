@@ -4,6 +4,13 @@ import attackData from "../../data/attacks.json";
 import { Trash2 as IconTrash } from "lucide-react";
 import { useFloating, autoUpdate, offset, flip, shift, useHover, useFocus, useDismiss, useRole, useInteractions } from '@floating-ui/react';
 
+type AttackParameter = {
+  name: string;
+  type: string | string[];
+  defaultValue: string | number | boolean;
+  hint?: string;
+};
+
 interface AttackFormProps {
   attackIndex: number;
   onDelete: () => void;
@@ -17,12 +24,14 @@ export default function AttackForm({ attackIndex, onDelete }: AttackFormProps) {
   const [selectedCategory, setSelectedCategory] = useState(attackCategories[0] || "");
   const [selectedAttack, setSelectedAttack] = useState("");
 
-  const specificAttacks = selectedCategory ? Object.keys(attackData.attacks[selectedCategory]) : [];
+  const specificAttacks = selectedCategory
+    ? Object.keys((attackData.attacks as { [category: string]: { [attackName: string]: { parameters: AttackParameter[] } } })[selectedCategory] || {})
+    : [];
   const attackParams = selectedCategory && selectedAttack
-    ? attackData.attacks[selectedCategory][selectedAttack]?.parameters || []
+    ? ((attackData.attacks as { [category: string]: { [attackName: string]: { parameters: AttackParameter[] } } })[selectedCategory]?.[selectedAttack]?.parameters || [])
     : [];
 
-  const [paramValues, setParamValues] = useState({});
+  const [paramValues, setParamValues] = useState<Record<string, string | number | boolean>>({});
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -41,18 +50,8 @@ export default function AttackForm({ attackIndex, onDelete }: AttackFormProps) {
 
   const { getReferenceProps, getFloatingProps } = useInteractions([hover, focus, dismiss, role]);
 
-  const handleParamChange = (name, value) => {
+  const handleParamChange = (name: string, value: string | number | boolean) => {
     setParamValues(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleDelete = (field: string) => {
-    setParamValues(prev => {
-      const updated = { ...prev };
-      if (field in updated) {
-        updated[field] = "";
-      }
-      return updated;
-    });
   };
 
   return (
@@ -105,7 +104,7 @@ export default function AttackForm({ attackIndex, onDelete }: AttackFormProps) {
             className="w-full border rounded px-3 py-2"
           >
             <option value="">Select Specific Attack</option>
-            {specificAttacks.map(a => (
+            {specificAttacks.map((a: string) => (
               <option key={a} value={a}>{a}</option>
             ))}
           </select>
@@ -113,23 +112,40 @@ export default function AttackForm({ attackIndex, onDelete }: AttackFormProps) {
         {/* Dinamic Parameters */}
         {attackParams.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-            {attackParams.map(param => (
+            {attackParams.map((param: {
+              name: string;
+              type: string | string[];
+              defaultValue: string | number | boolean;
+              hint?: string;
+            }) => (
               <div key={param.name} className="flex flex-col">
                 <label className="text-sm font-medium text-gray-700 mb-1">{param.name}</label>
                 {Array.isArray(param.type) ? (
                   <select
-                    value={paramValues[param.name] ?? param.defaultValue}
+                    value={
+                      paramValues[param.name] !== undefined
+                        ? String(paramValues[param.name])
+                        : String(param.defaultValue)
+                    }
                     onChange={e => handleParamChange(param.name, e.target.value)}
                     className="border rounded px-2 py-1"
                   >
-                    {param.type.map(opt => (
+                    {(param.type as string[]).map((opt: string) => (
                       <option key={opt} value={opt}>{opt}</option>
                     ))}
                   </select>
                 ) : (
                   <input
                     type={param.type === "int" ? "number" : "text"}
-                    value={paramValues[param.name] ?? param.defaultValue}
+                    value={
+                      paramValues[param.name] !== undefined
+                        ? param.type === "int"
+                          ? Number(paramValues[param.name])
+                          : String(paramValues[param.name])
+                        : param.type === "int"
+                          ? Number(param.defaultValue)
+                          : String(param.defaultValue)
+                    }
                     onChange={e => handleParamChange(param.name, param.type === "int" ? Number(e.target.value) : e.target.value)}
                     className="border rounded px-2 py-1"
                     ref={refs.setReference} {...getReferenceProps()}

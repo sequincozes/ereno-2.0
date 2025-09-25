@@ -5,11 +5,9 @@ import { Trash2 as IconTrash, Copy as IconCopy } from "lucide-react";
 
 export default function IedForm() {
   const { parameters, defaultValues } = iedData;
-  const [formValues, setFormValues] = useState(defaultValues);
-  const [switchValue, setSwitchValue] = useState(true);
+  const [formValues, setFormValues] = useState<Record<string, string | number | boolean | string[] | null>>(defaultValues);
 
-
-  const handleChange = (field: string, value: any) => {
+  const handleChange = (field: string, value: string | number | boolean) => {
     setFormValues(prev => ({ ...prev, [field]: value }));
   };
 
@@ -31,8 +29,8 @@ export default function IedForm() {
             return (
               <label key={key} className="flex items-center gap-2">
                 <Switch
-                  checked={switchValue}
-                  onCheckedChange={(e) => setSwitchValue(e.checked)}
+                  checked={!!formValues[key]}
+                  onCheckedChange={(e) => handleChange(key, e.checked)}
                 />
                 <span className="font-medium">
                   {key.charAt(0).toUpperCase() + key.slice(1)}
@@ -64,10 +62,17 @@ export default function IedForm() {
                   {key.charAt(0).toUpperCase() + key.slice(1)}
                 </span>
                 <select
-                  value={formValues[key]}
+                  value={
+                    Array.isArray(formValues[key])
+                      ? (formValues[key] as string[])[0] ?? ""
+                      : typeof formValues[key] === "boolean"
+                        ? ""
+                        : (formValues[key] as string | number) ?? ""
+                  }
+                  onChange={e => handleChange(key, e.target.value)}
                   className="border rounded px-2 py-1"
-                >;
-                  {type.map(option => (
+                >
+                  {type.map((option: string) => (
                     <option key={option} value={option}>
                       {option}
                     </option>
@@ -76,9 +81,9 @@ export default function IedForm() {
               </label>
             );
           }
-        if (key === "groupId" || key === "id") {
-            return;
-        }
+          if (key === "groupId" || key === "id") {
+            return null;
+          }
           return (
             <label key={key} className="flex flex-col">
               <span className="font-medium mb-1">
@@ -86,7 +91,13 @@ export default function IedForm() {
               </span>
               <input
                 type={type === "number" ? "number" : "text"}
-                value={formValues[key] ?? ""}
+                value={
+                  typeof formValues[key] === "boolean"
+                    ? ""
+                    : Array.isArray(formValues[key])
+                      ? (formValues[key] as string[])[0] ?? ""
+                      : formValues[key] ?? ""
+                }
                 onChange={e =>
                   handleChange(
                     key,

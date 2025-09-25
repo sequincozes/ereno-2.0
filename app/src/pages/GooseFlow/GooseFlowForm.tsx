@@ -3,10 +3,10 @@ import gooseData from "../../data/goose.json";
 
 export default function GooseFlowForm() {
   const { parameters, defaultValues } = gooseData;
-  const [formValues, setFormValues] = useState(defaultValues);
+  const [formValues, setFormValues] = useState<Record<string, string | number | boolean>>(defaultValues);
 
-  const handleChange = (field: string, value: any) => {
-    setFormValues(prev => ({ ...prev, [field]: value }));
+  const handleChange = (field: string, value: string | number | boolean) => {
+    setFormValues((prev: Record<string, string | number | boolean>) => ({ ...prev, [field]: value }));
   };
 
   return (
@@ -21,7 +21,7 @@ export default function GooseFlowForm() {
               </span>
               <input
                 type={type === "number" ? "number" : "text"}
-                value={formValues[key] ?? ""}
+                value={typeof formValues[key] === "boolean" ? "" : formValues[key] ?? ""}
                 onChange={e =>
                   handleChange(
                     key,
@@ -41,7 +41,7 @@ export default function GooseFlowForm() {
                 <input
                   className="checkbox"
                   type="checkbox"
-                  checked={!!formValues[key]}
+                  checked={!!formValues[key as keyof typeof formValues]}
                   onChange={e => handleChange(key, e.target.checked)}
                 />
                 {key.charAt(0).toUpperCase() + key.slice(1)}

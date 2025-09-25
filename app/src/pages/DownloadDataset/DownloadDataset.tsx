@@ -83,7 +83,7 @@ export default function DowloadDataset() {
                     &lt; Previous
                 </button>
                 <button className="border border-blue-800 bg-blue-500 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded"
-                    onClick={setShowModal}>
+                    onClick={() => setShowModal(true)}>
                     Finish
                 </button>
                 {showModal && <Modal title="Dataset Created!" content="The dataset will be created." />}

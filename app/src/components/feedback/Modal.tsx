@@ -1,14 +1,9 @@
 import React, { useState } from 'react';
 import {
   useFloating,
-  useClick,
-  useDismiss,
-  useRole,
-  useInteractions,
   useId,
   FloatingOverlay,
-  FloatingFocusManager,
-  useTransitionStyles
+  FloatingFocusManager
 } from '@floating-ui/react';
 
 type ModalProps = {
@@ -24,22 +19,6 @@ export default function Modal({ title, content }: ModalProps) {
     onOpenChange: setIsOpen
   });
 
-  const { isMounted, styles } = useTransitionStyles(context, {
-    duration: 200,
-    initial: {
-      opacity: 0,
-      transform: 'translateY(50px)'
-    }
-  });
-
-  const click = useClick(context);
-  const dismiss = useDismiss(context, {
-    outsidePressEvent: 'mousedown'
-  });
-  const role = useRole(context);
-
-  const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss, role]);
-
   const labelId = useId();
   const descriptionId = useId();
 
@@ -54,11 +33,7 @@ export default function Modal({ title, content }: ModalProps) {
               ref={refs.setFloating}
               aria-labelledby={labelId}
               aria-describedby={descriptionId}
-              {...getFloatingProps()}
               className="card bg-surface-100-900 p-4 space-y-4 shadow-xl max-w-screen-sm"
-              style={{
-                ...styles // Transition styles
-              }}
             >
               <header className="flex justify-between text-white">
                 <h2 className="h2">{title}</h2>

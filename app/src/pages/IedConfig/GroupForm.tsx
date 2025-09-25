@@ -8,32 +8,33 @@ const iedsCadastrados = [
 ];
 
 export default function GroupForm() {
-  const [groups, setGroups] = useState([
+  interface Group {
+    name: string;
+    ieds: number[];
+  }
+
+  const [groups, setGroups] = useState<Group[]>([
     { name: "", ieds: [] }
   ]);
 
-//   const handleAddGroup = () => {
-//     setGroups([...groups, { name: "", ieds: [] }]);
-//   };
-
-  const handleGroupNameChange = (idx, value) => {
+  const handleGroupNameChange = (idx: number, value: string) => {
     const updated = [...groups];
     updated[idx].name = value;
     setGroups(updated);
   };
 
-  const handleIedToggle = (groupIdx, iedId) => {
+  const handleIedToggle = (groupIdx: number, iedId: number) => {
     const updated = [...groups];
-    const ieds = updated[groupIdx].ieds;
+    const ieds = updated[groupIdx].ieds as number[];
     if (ieds.includes(iedId)) {
-      updated[groupIdx].ieds = ieds.filter(id => id !== iedId);
+      updated[groupIdx].ieds = ieds.filter((id: number) => id !== iedId);
     } else {
       updated[groupIdx].ieds = [...ieds, iedId];
     }
     setGroups(updated);
   };
 
-  const handleDeleteGroup = idx => {
+  const handleDeleteGroup = (idx: number) => {
     setGroups(groups.filter((_, i) => i !== idx));
   };
 
@@ -43,9 +44,9 @@ export default function GroupForm() {
         <div key={idx} className="border border-blue-500 rounded-md p-4 mb-4 relative">
           <button
             type="button"
-            className="absolute ml-2 px-2 py-1 top-4 right-4 text-white bg-red-500 rounded"
             onClick={() => handleDeleteGroup(idx)}
-            title="Delete Group"
+            className="ml-auto p-2 rounded border border-red-300 bg-red-100 text-red-600 hover:bg-red-200"
+            title="Excluir"
           >
             <IconTrash size={24} />
           </button>
