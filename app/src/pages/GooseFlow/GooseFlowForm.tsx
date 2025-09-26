@@ -1,5 +1,7 @@
 import { useState } from "react";
 import gooseData from "../../data/goose.json";
+import { Save as IconSave } from "lucide-react";
+import { addGooseFlow } from '../../services/gooseFlowService';
 
 export default function GooseFlowForm() {
   const { parameters, defaultValues } = gooseData;
@@ -7,6 +9,26 @@ export default function GooseFlowForm() {
 
   const handleChange = (field: string, value: string | number | boolean) => {
     setFormValues((prev: Record<string, string | number | boolean>) => ({ ...prev, [field]: value }));
+  };
+
+  // Save GooseFlow state to Firebase
+  const handleSaveGooseFlow = async () => {
+    try {
+      const gooseToSave: import('../../types/gooseFlowType').GooseFlowType = {
+        GoID: String(formValues.GoID),
+        numberOfMessages: Number(formValues.numberOfMessages),
+        ethType: String(formValues.ethType),
+        gooseAppid: String(formValues.gooseAppid),
+        TPID: String(formValues.TPID),
+        ndsCom: Boolean(formValues.ndsCom),
+        Test: Boolean(formValues.Test),
+        cbStatus: Boolean(formValues.cbStatus),
+      };
+      await addGooseFlow(gooseToSave);
+      alert('GOOSE Flow saved successfully!');
+    } catch {
+      alert('Error saving GOOSE Flow!');
+    }
   };
 
   return (
@@ -33,7 +55,7 @@ export default function GooseFlowForm() {
             </label>
           );
         })}
-        <div className="flex flex-row gap-6 mt-6">
+        <div className="flex flex-row gap-6 mt-6 items-center">
           {Object.entries(parameters).map(([key, type]) => {
             if (type !== "boolean") return null;
             return (
@@ -48,6 +70,14 @@ export default function GooseFlowForm() {
               </label>
             );
           })}
+          <button
+            type="button"
+            onClick={handleSaveGooseFlow}
+            className="p-2 rounded border border-green-300 bg-green-100 text-green-600 hover:bg-green-200"
+            title="Salvar GooseFlow"
+          >
+            <IconSave size={24} />
+          </button>
         </div>
       </div>
     </div>
