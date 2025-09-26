@@ -3,9 +3,14 @@ import iedData from "../../data/ied.json";
 import { Switch } from '@skeletonlabs/skeleton-react';
 import { Trash2 as IconTrash, Copy as IconCopy, Save as IconSave } from "lucide-react";
 
-import { addIed } from '../../services/iedService';
+import { addIed, deleteIed } from '../../services/iedService';
 
-export default function IedForm() {
+interface IedFormProps {
+  iedKey?: string;
+  onDeleteForm?: () => void;
+}
+
+export default function IedForm({ iedKey, onDeleteForm }: IedFormProps) {
   const { parameters, defaultValues } = iedData;
   const [formValues, setFormValues] = useState<Record<string, string | number | boolean | string[] | null>>(defaultValues);
 
@@ -13,14 +18,14 @@ export default function IedForm() {
     setFormValues(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleDelete = (field: string) => {
-    setFormValues(prev => {
-      const updated = { ...prev };
-      if (field in updated) {
-        updated[field] = "";
-      }
-      return updated;
-    });
+  // Delete the IED from Firebase and optionally remove the form
+  const handleDeleteIed = async () => {
+    if (iedKey) {
+      await deleteIed(iedKey);
+    }
+    if (onDeleteForm) {
+      onDeleteForm();
+    }
   };
 
   // Function to save the IED state to Firebase using the service
@@ -78,9 +83,9 @@ export default function IedForm() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => handleDelete(key)}
+                  onClick={handleDeleteIed}
                   className="ml-auto p-2 rounded border border-red-300 bg-red-100 text-red-600 hover:bg-red-200"
-                  title="Excluir"
+                  title="Excluir IED"
                 >
                   <IconTrash size={24} />
                 </button>

@@ -12,3 +12,7 @@ export async function getIeds() {
   const snapshot = await get(ref(db, 'ieds'));
   return snapshot.exists() ? snapshot.val() : {};
 }
+
+export async function deleteIed(iedKey: string) {
+  await set(ref(db, `ieds/${iedKey}`), null);
+}

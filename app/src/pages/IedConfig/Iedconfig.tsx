@@ -52,7 +52,11 @@ export default function IedConfig() {
 
           {/* Render each IED form below the previous one */}
           {iedForms.map((id) => (
-            <IedForm key={id} />
+            <IedForm
+              key={id}
+              iedKey={id.toString()}
+              onDeleteForm={() => setIedForms(prev => prev.filter(formId => formId !== id))}
+            />
           ))}
 
         </div>
