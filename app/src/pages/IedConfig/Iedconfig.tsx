@@ -5,13 +5,19 @@ import GroupForm from './GroupForm';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
+
 export default function IedConfig() {
-  const [showIedForm, setShowIedForm] = useState(false);
+  const [iedForms, setIedForms] = useState<number[]>([]);
   const [showGroupForm, setShowGroupForm] = useState(false);
 
   const moveToNextPage = () => {
     window.location.href = '/UploadCurrentFile';
-  }
+  };
+
+  const handleAddIed = () => {
+    setIedForms(prev => [...prev, Date.now()]);
+  };
+
   return (
     <main className="min-h-screen  bg-[#ECF0FF] flex flex-col">
       <Header />
@@ -36,15 +42,18 @@ export default function IedConfig() {
             Configure Intelligent Electronic Devices for simulation
           </p>
           <button className="bg-blue-500 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded mb-4"
-          onClick={() => setShowIedForm(true)}>
+            onClick={handleAddIed}>
             + Add IED
           </button>
           <div className="bg-[#ECF0FF] text-[#0051A2] px-3 py-2 rounded text-sm">
             <b>Limits:</b> Maximum of 1 Publisher and 10 Subscribers | Current:
-            0 Publisher, 0 Subscriber(s)
+            {iedForms.length} Publisher, {iedForms.length} Subscriber(s)
           </div>
-          
-          {showIedForm && <IedForm />}
+
+          {/* Render each IED form below the previous one */}
+          {iedForms.map((id) => (
+            <IedForm key={id} />
+          ))}
 
         </div>
 
@@ -57,10 +66,10 @@ export default function IedConfig() {
             Organize IEDs into groups for attack application
           </p>
           <button className="bg-blue-500 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded"
-          onClick={() => setShowGroupForm(true)}>
+            onClick={() => setShowGroupForm(true)}>
             + Add Group
           </button>
-          
+
           {showGroupForm && <GroupForm />}
         </div>
       </div>
@@ -73,5 +82,5 @@ export default function IedConfig() {
         </button>
       </footer>
     </main>
-  )
+  );
 }
