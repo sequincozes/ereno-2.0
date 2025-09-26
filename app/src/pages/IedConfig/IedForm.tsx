@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getIeds } from '../../services/iedService';
 import iedData from "../../data/ied.json";
 import { Switch } from '@skeletonlabs/skeleton-react';
 import { Trash2 as IconTrash, Copy as IconCopy, Save as IconSave } from "lucide-react";
@@ -13,6 +14,18 @@ interface IedFormProps {
 export default function IedForm({ iedKey, onDeleteForm }: IedFormProps) {
   const { parameters, defaultValues } = iedData;
   const [formValues, setFormValues] = useState<Record<string, string | number | boolean | string[] | null>>(defaultValues);
+
+  useEffect(() => {
+    async function fetchIedFromDb() {
+      if (iedKey) {
+        const ieds = await getIeds();
+        if (ieds && ieds[iedKey]) {
+          setFormValues(ieds[iedKey]);
+        }
+      }
+    }
+    fetchIedFromDb();
+  }, [iedKey]);
 
   const handleChange = (field: string, value: string | number | boolean) => {
     setFormValues(prev => ({ ...prev, [field]: value }));
