@@ -1,7 +1,8 @@
 
 import { useState } from "react";
 import attackData from "../../data/attacks.json";
-import { Trash2 as IconTrash } from "lucide-react";
+import { Trash2 as IconTrash, Save as IconSave } from "lucide-react";
+import { addAttackConfig } from '../../services/attackConfigService';
 import { useFloating, autoUpdate, offset, flip, shift, useHover, useFocus, useDismiss, useRole, useInteractions } from '@floating-ui/react';
 
 type AttackParameter = {
@@ -54,10 +55,25 @@ export default function AttackForm({ attackIndex, onDelete }: AttackFormProps) {
     setParamValues(prev => ({ ...prev, [name]: value }));
   };
 
+  // Save AttackConfig state to Firebase
+  const handleSaveAttackConfig = async () => {
+    try {
+      const attackToSave: import('../../types/attackConfigType').AttackConfigType = {
+        targetGroup: selectedGroup,
+        category: selectedCategory,
+        specificAttack: selectedAttack,
+        parameters: paramValues,
+      };
+      await addAttackConfig(attackToSave);
+      alert('Attack Config saved successfully!');
+    } catch {
+      alert('Error saving Attack Config!');
+    }
+  };
+
   return (
     <div className="border border-blue-500 rounded-xl p-6 mt-4">
       <div className="flex items-center gap-4 mb-4">
-        <input type="checkbox" checked={true} className="accent-black" readOnly />
         <input type="text" value={`Ataque ${attackIndex + 1}`} className="border rounded px-3 py-2 bg-white" readOnly />
         <button className="ml-auto p-2 rounded border border-red-300 bg-red-100 text-red-600 hover:bg-red-200" onClick={onDelete}>
           <IconTrash size={20} />
@@ -97,7 +113,6 @@ export default function AttackForm({ attackIndex, onDelete }: AttackFormProps) {
         {/* Specific Attack */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Specific Attack</label>
-          {/* <span className="text-xs text-gray-500 mb-1 block">{selectedAttack ? "" : "Selecione o ataque específico"}</span> */}
           <select
             value={selectedAttack}
             onChange={e => setSelectedAttack(e.target.value)}
@@ -111,7 +126,7 @@ export default function AttackForm({ attackIndex, onDelete }: AttackFormProps) {
         </div>
         {/* Dinamic Parameters */}
         {attackParams.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 items-end">
             {attackParams.map((param: {
               name: string;
               type: string | string[];
@@ -158,6 +173,16 @@ export default function AttackForm({ attackIndex, onDelete }: AttackFormProps) {
                 )}
               </div>
             ))}
+            <div className="flex justify-end w-full md:col-span-2">
+              <button
+                type="button"
+                onClick={handleSaveAttackConfig}
+                className="px-4 py-2 rounded border border-green-600 bg-green-100 text-green-700 hover:bg-green-200 flex items-center gap-2 ml-auto p-2"
+                title="Salvar Attack Config"
+              >
+                <IconSave size={20} />
+              </button>
+            </div>
           </div>
         )}
       </div>
