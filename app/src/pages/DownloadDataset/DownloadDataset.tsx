@@ -3,6 +3,9 @@ import { Target as IconTarget } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import Modal from "../../components/feedback/Modal"
+import { getIeds } from '../../services/iedService';
+import { getGooseFlows } from '../../services/gooseFlowService';
+import { getAttackConfigs } from '../../services/attackConfigService';
 
 export default function DowloadDataset() {
 
@@ -10,9 +13,39 @@ export default function DowloadDataset() {
     const [fileFormat, setFileFormat] = useState(".CSV");
     const [goose, setGoose] = useState(true);
     const [sv, setSv] = useState(false);
+    const [datasetName, setDatasetName] = useState("");
 
     const moveToLastPage = () => {
         window.location.href = '/attackConfig';
+    }
+
+    async function handleJsonDownload() {
+        // Fetch all config data
+        const ieds = await getIeds();
+        const gooseFlows = await getGooseFlows();
+        const attackConfigs = await getAttackConfigs();
+        const config = {
+            datasetName,
+            fileFormat,
+            messageTypes: {
+                goose,
+                sv
+            },
+            ieds,
+            gooseFlows,
+            attackConfigs
+        };
+        const jsonStr = JSON.stringify(config, null, 2);
+        const blob = new Blob([jsonStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = (datasetName || 'dataset') + '.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        setShowModal(true);
     }
 
     const fileFormats = [".CSV", ".PCAP", ".ARFF"];
@@ -35,7 +68,7 @@ export default function DowloadDataset() {
                 <div className="bg-white rounded-md shadow p-6">
                     <h3 className="flex items-center gap-2 text-[#0051A2] text-lg mb-1 font-bold">
                         <IconTarget className="w-5 h-5"/>
-                        Dataset Download
+                        JSON Download
                     </h3>
                     <p className="text-gray-600 mb-4">
                         Configure the file format of the dataset
@@ -45,7 +78,8 @@ export default function DowloadDataset() {
                             <label className="block text-sm font-medium text-gray-700">Name <span className="text-red-600">*</span></label>
                             <input
                                 type="text"
-                                onChange={e => console.log(e.target.value)}
+                                value={datasetName}
+                                onChange={e => setDatasetName(e.target.value)}
                                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500"
                                 placeholder="e.g., Dataset_01"
                             />
@@ -83,8 +117,8 @@ export default function DowloadDataset() {
                     &lt; Previous
                 </button>
                 <button className="border border-blue-800 bg-blue-500 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded"
-                    onClick={() => setShowModal(true)}>
-                    Finish
+                    onClick={handleJsonDownload}>
+                    JSON download
                 </button>
                 {showModal && <Modal title="Dataset Created!" content="The dataset will be created." />}
             </footer>
