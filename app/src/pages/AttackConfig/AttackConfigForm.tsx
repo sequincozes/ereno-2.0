@@ -1,8 +1,10 @@
 
 import { useState } from "react";
-import attackData from "../../data/attacks.json";
+import attackData from "../../data/attacks_properties.json";
 import { Trash2 as IconTrash, Save as IconSave } from "lucide-react";
 import { addAttackConfig } from '../../services/attackConfigService';
+import { buildNestedAttackObject } from '../../utils/attackObjectBuilder';
+import { formatAttackInputLabel } from '../../utils/formatAttackInputLabel';
 import { useFloating, autoUpdate, offset, flip, shift, useHover, useFocus, useDismiss, useRole, useInteractions } from '@floating-ui/react';
 
 type AttackParameter = {
@@ -18,10 +20,8 @@ interface AttackFormProps {
 }
 
 export default function AttackForm({ attackIndex, onDelete }: AttackFormProps) {
-  const compromisedGroups = attackData.iedConfiguration.compromisedIED;
   const attackCategories = Object.keys(attackData.attacks);
 
-  const [selectedGroup, setSelectedGroup] = useState(compromisedGroups[0] || "");
   const [selectedCategory, setSelectedCategory] = useState(attackCategories[0] || "");
   const [selectedAttack, setSelectedAttack] = useState("");
 
@@ -58,12 +58,14 @@ export default function AttackForm({ attackIndex, onDelete }: AttackFormProps) {
   // Save AttackConfig state to Firebase
   const handleSaveAttackConfig = async () => {
     try {
-      const attackToSave: import('../../types/attackConfigType').AttackConfigType = {
-        targetGroup: selectedGroup,
+      // Build nested attack object with selectedAttack as dynamic key
+      const nestedAttack = buildNestedAttackObject(paramValues, selectedAttack);
+      const attackToSave = {
         category: selectedCategory,
         specificAttack: selectedAttack,
-        parameters: paramValues,
+        parameters: nestedAttack,
       };
+      console.log('Saving Attack Config:', attackToSave);
       await addAttackConfig(attackToSave);
       alert('Attack Config saved successfully!');
     } catch {
@@ -81,7 +83,7 @@ export default function AttackForm({ attackIndex, onDelete }: AttackFormProps) {
       </div>
       <hr className="my-4 border-blue-200" />
       <div className="flex flex-col gap-4">
-        {/* Target Group */}
+        {/* Target Group
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Target Group</label>
           <select
@@ -93,7 +95,7 @@ export default function AttackForm({ attackIndex, onDelete }: AttackFormProps) {
               <option key={g} value={g}>{g}</option>
             ))}
           </select>
-        </div>
+        </div> */}
         {/* Attack Category */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Attack Category</label>
@@ -134,7 +136,7 @@ export default function AttackForm({ attackIndex, onDelete }: AttackFormProps) {
               hint?: string;
             }) => (
               <div key={param.name} className="flex flex-col">
-                <label className="text-sm font-medium text-gray-700 mb-1">{param.name}</label>
+                <label className="text-sm font-medium text-gray-700 mb-1">{formatAttackInputLabel(param.name)}</label>
                 {Array.isArray(param.type) ? (
                   <select
                     value={
@@ -149,16 +151,23 @@ export default function AttackForm({ attackIndex, onDelete }: AttackFormProps) {
                       <option key={opt} value={opt}>{opt}</option>
                     ))}
                   </select>
+                ) : param.type === "boolean" ? (
+                  <input
+                    type="checkbox"
+                    checked={Boolean(paramValues[param.name] !== undefined ? paramValues[param.name] : param.defaultValue)}
+                    onChange={e => handleParamChange(param.name, e.target.checked)}
+                    className="checkbox"
+                  />
                 ) : (
                   <input
                     type={param.type === "int" ? "number" : "text"}
                     value={
                       paramValues[param.name] !== undefined
                         ? param.type === "int"
-                          ? Number(paramValues[param.name])
+                          ? paramValues[param.name]
                           : String(paramValues[param.name])
                         : param.type === "int"
-                          ? Number(param.defaultValue)
+                          ? param.defaultValue
                           : String(param.defaultValue)
                     }
                     onChange={e => handleParamChange(param.name, param.type === "int" ? Number(e.target.value) : e.target.value)}

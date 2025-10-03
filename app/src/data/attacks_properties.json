@@ -1,0 +1,82 @@
+
+        {
+          "attacks": {
+            "Replay": {
+              "RandomReplay": {
+                "parameters": [
+                  { "name": "attack.randomReplay.delay.min", "type": "float", "defaultValue": 0.01 },
+                  { "name": "attack.randomReplay.delay.max", "type": "float", "defaultValue": 10.0 },
+                  { "name": "attack.randomReplay.count", "type": "int", "defaultValue": 100 }
+                ]
+              },
+              "RandomReplayV2": {
+                "parameters": [
+                  { "name": "attack.randomReplayV2.count.lambda", "type": "int", "defaultValue": 800 },
+                  { "name": "attack.randomReplayV2.delay.ms.min", "type": "float", "defaultValue": 0.5 },
+                  { "name": "attack.randomReplayV2.delay.ms.max", "type": "float", "defaultValue": 8 },
+                  { "name": "attack.randomReplayV2.burst.prob", "type": "float", "defaultValue": 0.35 },
+                  { "name": "attack.randomReplayV2.burst.min", "type": "int", "defaultValue": 20 },
+                  { "name": "attack.randomReplayV2.burst.max", "type": "int", "defaultValue": 40 },
+                  { "name": "attack.randomReplayV2.burst.gap.ms.min", "type": "float", "defaultValue": 0.3 },
+                  { "name": "attack.randomReplayV2.burst.gap.ms.max", "type": "float", "defaultValue": 2.0 },
+                  { "name": "attack.randomReplayV2.reorder.prob", "type": "float", "defaultValue": 0.15 },
+                  { "name": "attack.randomReplayV2.ttl.override.ms.values", "type": "string", "defaultValue": "40,10,2,0" },
+                  { "name": "attack.randomReplayV2.ttl.override.prob", "type": "float", "defaultValue": 0.2 },
+                  { "name": "attack.randomReplayV2.eth.src.spoof.prob", "type": "float", "defaultValue": 0.1 },
+                  { "name": "attack.randomReplayV2.eth.dst.spoof.prob", "type": "float", "defaultValue": 0.05 }
+                ]
+              }
+            },
+            "Masquerade": {
+              "FakeFault": {
+                "parameters": [
+                  { "name": "attack.masqueradeFault.delayFromEvent", "type": "float", "defaultValue": 0.00631 },
+                  { "name": "attack.masqueradeFault.initialBackoffInterval", "type": "float", "defaultValue": 6.33 },
+                  { "name": "attack.masqueradeFault.minTimeMs", "type": "int", "defaultValue": 10 },
+                  { "name": "attack.masqueradeFault.maxTimeMs", "type": "int", "defaultValue": 1000 },
+                  { "name": "attack.masqueradeFault.count", "type": "int", "defaultValue": -1 }
+                ]
+              },
+              "FakeFaultV2": {
+                "parameters": [
+                  { "name": "attack.masqFault.fault.prob", "type": "float", "defaultValue": 0.6 },
+                  { "name": "attack.masqFault.fault.duration.ms.min", "type": "int", "defaultValue": 50 },
+                  { "name": "attack.masqFault.fault.duration.ms.max", "type": "int", "defaultValue": 800 },
+                  { "name": "attack.masqFault.cbStatus", "type": "int", "defaultValue": 1 },
+                  { "name": "attack.masqFault.increment.stnum.on.fault", "type": "boolean", "defaultValue": true },
+                  { "name": "attack.masqFault.sqnum.mode", "type": "string", "defaultValue": "fast" },
+                  { "name": "attack.masqFault.ttl.ms.values", "type": "string", "defaultValue": "20,40,80" },
+                  { "name": "attack.masqFault.ttl.override.prob", "type": "float", "defaultValue": 1.0 }
+                ]
+              }
+            },
+            "Injection": {
+              "RandomInjection": {
+                "parameters": [
+                  { "name": "attack.injection.count", "type": "int", "defaultValue": -1 }
+                ]
+              }
+            },
+            "DoS": {
+              "Greyhole": {
+                "parameters": [
+                  { "name": "attack.greyhole.selectionRate", "type": "int", "defaultValue": 40 }
+                ]
+              },
+              "GreyholeV2": {
+                "parameters": [
+                  { "name": "attack.greyhole.drop.rate.min", "type": "float", "defaultValue": 0.05 },
+                  { "name": "attack.greyhole.drop.rate.max", "type": "float", "defaultValue": 0.45 },
+                  { "name": "attack.greyhole.burst.drop.prob", "type": "float", "defaultValue": 0.3 },
+                  { "name": "attack.greyhole.burst.drop.len.min", "type": "float", "defaultValue": 2.0 },
+                  { "name": "attack.greyhole.burst.drop.len.max", "type": "float", "defaultValue": 5.0 },
+                  { "name": "attack.greyhole.extra.delay.ms.min", "type": "float", "defaultValue": 0.5 },
+                  { "name": "attack.greyhole.extra.delay.ms.max", "type": "float", "defaultValue": 25.0 },
+                  { "name": "attack.greyhole.delay.burst.prob", "type": "float", "defaultValue": 0.2 },
+                  { "name": "attack.greyhole.delay.burst.len.min", "type": "float", "defaultValue": 3.0 },
+                  { "name": "attack.greyhole.delay.burst.len.max", "type": "float", "defaultValue": 40.0 }
+                ]
+              }
+            }
+          }
+        }
