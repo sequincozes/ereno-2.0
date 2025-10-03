@@ -1,0 +1,26 @@
+{
+  "parameters": {
+    "id": "number",
+    "groupId": "number",
+    "name": "string",
+    "gocbRef": "string",
+    "timestamp": "number",
+    "datSet": "string",
+    "stNum": "number",
+    "sqNum": "number",
+    "minTime": "number",
+    "maxTime": "number"
+  },
+  "defaultValues": {
+    "id": 1,
+    "name": "defaultIED",
+    "gocbRef": "LD/LLN0$GO$gcbA",
+    "datSet": "LD/LLN0$IntLockA",
+    "timestamp": 0,
+    "stNum": 1,
+    "sqNum": 1,
+    "minTime": 10,
+    "maxTime": 1000,
+    "groupId": null
+  }
+}
