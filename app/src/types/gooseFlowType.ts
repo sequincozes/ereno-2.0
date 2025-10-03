@@ -1,6 +1,7 @@
 export interface GooseFlowType {
   GoID: string;
-  numberOfMessages: number;
+  ethSrc: string;
+  ethDst: string;
   ethType: string;
   gooseAppid: string;
   TPID: string;

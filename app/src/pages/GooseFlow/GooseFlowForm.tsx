@@ -1,5 +1,5 @@
 import { useState } from "react";
-import gooseData from "../../data/goose.json";
+import gooseData from "../../data/goose_properties.json";
 import { Save as IconSave } from "lucide-react";
 import { addGooseFlow } from '../../services/gooseFlowService';
 
@@ -14,15 +14,26 @@ export default function GooseFlowForm() {
   // Save GooseFlow state to Firebase
   const handleSaveGooseFlow = async () => {
     try {
-      const gooseToSave: import('../../types/gooseFlowType').GooseFlowType = {
+      const gooseToSave = {
         GoID: String(formValues.GoID),
-        numberOfMessages: Number(formValues.numberOfMessages),
+        ethSrc: String(formValues.ethSrc),
+        ethDst: String(formValues.ethDst),
         ethType: String(formValues.ethType),
         gooseAppid: String(formValues.gooseAppid),
         TPID: String(formValues.TPID),
         ndsCom: Boolean(formValues.ndsCom),
         Test: Boolean(formValues.Test),
         cbStatus: Boolean(formValues.cbStatus),
+        message: {
+          count: Number(formValues.numberOfMessages)
+        },
+        sv: {
+          per: {
+            goose: {
+              multiplier: Number(formValues.svPerGoose)
+            }
+          }
+        }
       };
       await addGooseFlow(gooseToSave);
       alert('GOOSE Flow saved successfully!');

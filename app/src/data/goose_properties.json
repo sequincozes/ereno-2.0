@@ -1,0 +1,28 @@
+{
+  "parameters": {
+    "GoID": "string",
+    "numberOfMessages": "number",
+    "ethSrc": "string",
+    "ethDst": "string",
+    "ethType": "string",
+    "gooseAppid": "string",
+    "TPID": "string",
+    "svPerGoose": "number",
+    "ndsCom": "boolean",
+    "Test": "boolean",
+    "cbStatus": "boolean"
+  },
+  "defaultValues": {
+    "GoID": "IED1/LLN0$GO$gcb01",
+    "numberOfMessages": 100,
+    "ethSrc": "AA:BB:CC:DD:EE:FF",
+    "ethDst": "01:0C:CD:01:00:01",
+    "ethType": "0x88B8",
+    "gooseAppid": "0001",
+    "TPID": "0x8100",
+    "svPerGoose": 2,
+    "ndsCom": false,
+    "Test": false,
+    "cbStatus": false
+  }
+}
