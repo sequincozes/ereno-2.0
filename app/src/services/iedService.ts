@@ -1,3 +1,21 @@
+import type { GroupType } from '../types/groupType';
+// Add a group to Firebase
+export async function addGroup(group: GroupType) {
+  const groupRef = push(ref(db, 'groups'));
+  await set(groupRef, group);
+  return groupRef.key;
+}
+
+// Get all groups from Firebase
+export async function getGroups() {
+  const snapshot = await get(ref(db, 'groups'));
+  return snapshot.exists() ? snapshot.val() : {};
+}
+
+// Delete a group from Firebase
+export async function deleteGroup(groupKey: string) {
+  await set(ref(db, `groups/${groupKey}`), null);
+}
 import { db } from '../config/firebase';
 import { ref, set, get, push } from 'firebase/database';
 import type { IedType } from '../types/iedType'; 

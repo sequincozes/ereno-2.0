@@ -1,11 +1,12 @@
 import Header from "../../components/common/Header";
 import { Target as IconTarget } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getAttackConfigs } from '../../services/attackConfigService';
 import { Link } from "react-router-dom";
 import AttackForm from "./AttackConfigForm";
 
 export default function AttackConfig() {
-    const [attackForms, setAttackForms] = useState([0]);
+    const [attackForms, setAttackForms] = useState<string[]>([]);
 
     const moveToLastPage = () => {
         window.location.href = '/gooseFlow';
@@ -16,12 +17,19 @@ export default function AttackConfig() {
     }
 
     const handleAddAttack = () => {
-        setAttackForms(prev => [...prev, prev.length]);
+        setAttackForms(prev => [...prev, Date.now().toString()]);
     };
 
-    const handleDeleteAttack = (idx: number) => {
-        setAttackForms(prev => prev.filter((_, i) => i !== idx));
-    };
+    // Fetch saved attacks on mount
+    useEffect(() => {
+        async function fetchAttacks() {
+            const attacks = await getAttackConfigs();
+            if (attacks && typeof attacks === 'object') {
+                setAttackForms(Object.keys(attacks));
+            }
+        }
+        fetchAttacks();
+    }, []);
 
     return(
         <main className="min-h-screen bg-[#ECF0FF] flex flex-col">
@@ -50,8 +58,8 @@ export default function AttackConfig() {
                         onClick={handleAddAttack}>
                         + Add Attack
                     </button>
-                    {attackForms.map((_, idx) => (
-                        <AttackForm key={idx} attackIndex={idx} onDelete={() => handleDeleteAttack(idx)} />
+                    {attackForms.map((id, idx) => (
+                        <AttackForm key={id} attackIndex={idx} onDelete={() => setAttackForms(prev => prev.filter(formId => formId !== id))} />
                     ))}
                 </div>
             </div>

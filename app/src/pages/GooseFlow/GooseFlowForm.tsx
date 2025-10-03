@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getGooseFlows } from '../../services/gooseFlowService';
 import gooseData from "../../data/goose.json";
 import { Save as IconSave } from "lucide-react";
 import { addGooseFlow } from '../../services/gooseFlowService';
@@ -6,6 +7,21 @@ import { addGooseFlow } from '../../services/gooseFlowService';
 export default function GooseFlowForm() {
   const { parameters, defaultValues } = gooseData;
   const [formValues, setFormValues] = useState<Record<string, string | number | boolean>>(defaultValues);
+
+  // Fetch saved GooseFlow on mount
+  useEffect(() => {
+    async function fetchGoose() {
+      const gooseFlows = await getGooseFlows();
+      if (gooseFlows && typeof gooseFlows === 'object') {
+        // Get the last saved GooseFlow
+        const keys = Object.keys(gooseFlows);
+        if (keys.length > 0) {
+          setFormValues(gooseFlows[keys[keys.length - 1]]);
+        }
+      }
+    }
+    fetchGoose();
+  }, []);
 
   const handleChange = (field: string, value: string | number | boolean) => {
     setFormValues((prev: Record<string, string | number | boolean>) => ({ ...prev, [field]: value }));

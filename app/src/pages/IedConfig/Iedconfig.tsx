@@ -12,7 +12,7 @@ export default function IedConfig() {
   const [showGroupForm, setShowGroupForm] = useState(false);
 
   const moveToNextPage = () => {
-    window.location.href = '/UploadCurrentFile';
+    window.location.href = '/gooseFlow';
   };
 
   const handleAddIed = () => {
