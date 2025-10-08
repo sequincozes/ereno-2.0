@@ -29,7 +29,7 @@ export default function AttackConfig() {
 
             {/* Stepper */}
             <div className="flex justify-between items-center px-16 py-8 text-sm font-medium">
-                <Link to="/" className="text-gray-600 hover:underline cursor-pointer">IED Config</Link>
+                <Link to="/iedconfig" className="text-gray-600 hover:underline cursor-pointer">IED Config</Link>
                 <Link to="/gooseFlow" className="text-gray-600 hover:underline cursor-pointer">GOOSE Flow Config</Link>
                 <span className="text-[#0051A2]">Attack Config</span>
                 <Link to="/downloadDataset" className="text-gray-600 hover:underline cursor-pointer">Download Dataset</Link>

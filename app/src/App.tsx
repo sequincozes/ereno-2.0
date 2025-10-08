@@ -1,4 +1,5 @@
 import { Route, BrowserRouter, Routes } from "react-router-dom";
+import Login from "./pages/Login/login";
 import Iedconfig from "./pages/IedConfig/Iedconfig";
 import GooseFlow from './pages/GooseFlow/GooseFlow';
 import AttackConfig from './pages/AttackConfig/AttackConfig';
@@ -9,7 +10,8 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Iedconfig />} />
+        <Route path="/" element={<Login />} />
+        <Route path="/iedconfig" element={<Iedconfig />} />
         <Route path="/uploadCurrentFile" element={<UploadCurrentFile />} />
         <Route path="/gooseFlow" element={<GooseFlow />} />
         <Route path="/attackConfig" element={<AttackConfig />} />

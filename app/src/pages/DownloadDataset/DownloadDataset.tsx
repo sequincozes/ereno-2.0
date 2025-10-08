@@ -56,7 +56,7 @@ export default function DowloadDataset() {
 
             {/* Stepper */}
             <div className="flex justify-between items-center px-16 py-8 text-sm font-medium">
-                <Link to="/" className="text-gray-600 hover:underline cursor-pointer">IED Config</Link>
+                <Link to="/iedconfig" className="text-gray-600 hover:underline cursor-pointer">IED Config</Link>
                 <Link to="/gooseFlow" className="text-gray-600 hover:underline cursor-pointer">GOOSE Flow Config</Link>
                 <Link to="/attackConfig" className="text-gray-600 hover:underline cursor-pointer">Attack Config</Link>
                 <span className="text-[#0051A2]">Download Dataset</span>

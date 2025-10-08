@@ -19,7 +19,7 @@ export default function GooseFlow() {
 
             {/* Stepper */}
             <div className="flex justify-between items-center px-16 py-8 text-sm font-medium">
-                <Link to="/" className="text-gray-600 hover:underline cursor-pointer">IED Config</Link>
+                <Link to="/iedconfig" className="text-gray-600 hover:underline cursor-pointer">IED Config</Link>
                 <span className="text-[#0051A2]">GOOSE Flow Config</span>
                 <Link to="/attackConfig" className="text-gray-600 hover:underline cursor-pointer">Attack Config</Link>
                 <Link to="/downloadDataset" className="text-gray-600 hover:underline cursor-pointer">Download Dataset</Link>
