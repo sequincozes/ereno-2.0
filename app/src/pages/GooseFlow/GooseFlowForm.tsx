@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import gooseData from "../../data/goose_properties.json";
 import { Save as IconSave } from "lucide-react";
 import { addGooseFlow } from '../../services/gooseFlowService';
+import AuthContext from "../../context/authContext";
 
 export default function GooseFlowForm() {
   const { parameters, defaultValues } = gooseData;
@@ -10,6 +11,9 @@ export default function GooseFlowForm() {
   const handleChange = (field: string, value: string | number | boolean) => {
     setFormValues((prev: Record<string, string | number | boolean>) => ({ ...prev, [field]: value }));
   };
+
+  const authContext = useContext(AuthContext);
+  const user = authContext?.user;
 
   // Save GooseFlow state to Firebase
   const handleSaveGooseFlow = async () => {
@@ -35,7 +39,11 @@ export default function GooseFlowForm() {
           }
         }
       };
-      await addGooseFlow(gooseToSave);
+      if (!user) {
+        alert('User not authenticated!');
+        return;
+      }
+      await addGooseFlow(gooseToSave, user.uid);
       alert('GOOSE Flow saved successfully!');
     } catch {
       alert('Error saving GOOSE Flow!');

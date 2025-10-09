@@ -1,11 +1,11 @@
-
-import { useState } from "react";
+import { useContext, useState } from "react";
 import attackData from "../../data/attacks_properties.json";
 import { Trash2 as IconTrash, Save as IconSave } from "lucide-react";
 import { addAttackConfig } from '../../services/attackConfigService';
 import { buildNestedAttackObject } from '../../utils/attackObjectBuilder';
 import { formatAttackInputLabel } from '../../utils/formatAttackInputLabel';
 import { useFloating, autoUpdate, offset, flip, shift, useHover, useFocus, useDismiss, useRole, useInteractions } from '@floating-ui/react';
+import AuthContext from "../../context/authContext";
 
 type AttackParameter = {
   name: string;
@@ -55,6 +55,9 @@ export default function AttackForm({ attackIndex, onDelete }: AttackFormProps) {
     setParamValues(prev => ({ ...prev, [name]: value }));
   };
 
+  const authContext = useContext(AuthContext);
+  const user = authContext?.user;
+
   // Save AttackConfig state to Firebase
   const handleSaveAttackConfig = async () => {
     try {
@@ -65,8 +68,11 @@ export default function AttackForm({ attackIndex, onDelete }: AttackFormProps) {
         specificAttack: selectedAttack,
         parameters: nestedAttack,
       };
-      console.log('Saving Attack Config:', attackToSave);
-      await addAttackConfig(attackToSave);
+      if (!user) {
+        alert('User not authenticated!');
+        return;
+      }
+      await addAttackConfig(attackToSave, user.uid);
       alert('Attack Config saved successfully!');
     } catch {
       alert('Error saving Attack Config!');

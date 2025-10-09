@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import iedData from "../../data/ied_properties.json";
 import { Trash2 as IconTrash, Copy as IconCopy, Save as IconSave } from "lucide-react";
-
 import { addIed, deleteIed } from '../../services/iedService';
+import AuthContext from "../../context/authContext";
 
 interface IedFormProps {
   iedKey?: string;
@@ -12,6 +12,8 @@ interface IedFormProps {
 export default function IedForm({ iedKey, onDeleteForm }: IedFormProps) {
   const { parameters, defaultValues } = iedData;
   const [formValues, setFormValues] = useState<Record<string, string | number | boolean | string[] | null>>(defaultValues);
+  const authContext = useContext(AuthContext);
+  const user = authContext?.user;
 
   const handleChange = (field: string, value: string | number | boolean) => {
     setFormValues(prev => ({ ...prev, [field]: value }));
@@ -19,8 +21,8 @@ export default function IedForm({ iedKey, onDeleteForm }: IedFormProps) {
 
   // Delete the IED from Firebase and optionally remove the form
   const handleDeleteIed = async () => {
-    if (iedKey) {
-      await deleteIed(iedKey);
+    if (iedKey && user) {
+      await deleteIed(iedKey, user.uid);
     }
     if (onDeleteForm) {
       onDeleteForm();
@@ -41,7 +43,11 @@ export default function IedForm({ iedKey, onDeleteForm }: IedFormProps) {
         minTime: Number(formValues.minTime),
         maxTime: Number(formValues.maxTime),
       };
-      await addIed(iedToSave);
+      if (!user) {
+        alert('User not authenticated!');
+        return;
+      }
+      await addIed(iedToSave, user.uid);
       alert('IED saved successfully!');
     } catch {
       alert('Error saving IED!');
