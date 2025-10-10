@@ -2,21 +2,37 @@ import { Group as IconGroup, Server as IconServer } from 'lucide-react';
 import Header from '../../components/common/Header';
 import IedForm from './IedForm';
 import GroupForm from './GroupForm';
-import { useState } from 'react';
+import { useState, useEffect, useContext } from 'react';
+import { getIeds } from '../../services/iedService';
 import { Link } from 'react-router-dom';
+import AuthContext from '../../context/authContext';
 
 
 export default function IedConfig() {
-  const [iedForms, setIedForms] = useState<number[]>([]);
+  const [iedForms, setIedForms] = useState<string[]>([]);
   const [showGroupForm, setShowGroupForm] = useState(false);
+  const authContext = useContext(AuthContext);
+  const user = authContext?.user;
 
   const moveToNextPage = () => {
-    window.location.href = '/UploadCurrentFile';
+    window.location.href = '/GooseFlow';
   };
 
   const handleAddIed = () => {
-    setIedForms(prev => [...prev, Date.now()]);
+    setIedForms(prev => [...prev, Date.now().toString()]);
   };
+
+  // Fetch saved IEDs on mount
+  useEffect(() => {
+    async function fetchIeds() {
+      if (!user) return;
+      const ieds = await getIeds(user.uid);
+      if (ieds && typeof ieds === 'object') {
+        setIedForms(Object.keys(ieds));
+      }
+    }
+    fetchIeds();
+  }, []);
 
   return (
     <main className="min-h-screen  bg-[#ECF0FF] flex flex-col">
@@ -54,7 +70,7 @@ export default function IedConfig() {
           {iedForms.map((id) => (
             <IedForm
               key={id}
-              iedKey={id.toString()}
+              iedKey={id}
               onDeleteForm={() => setIedForms(prev => prev.filter(formId => formId !== id))}
             />
           ))}

@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import iedData from "../../data/ied_properties.json";
 import { Trash2 as IconTrash, Copy as IconCopy, Save as IconSave } from "lucide-react";
 import { addIed, deleteIed } from '../../services/iedService';
@@ -9,11 +9,25 @@ interface IedFormProps {
   onDeleteForm?: () => void;
 }
 
-export default function IedForm({ iedKey, onDeleteForm }: IedFormProps) {
+const IedForm: React.FC<IedFormProps> = ({ iedKey, onDeleteForm }) => {
   const { parameters, defaultValues } = iedData;
   const [formValues, setFormValues] = useState<Record<string, string | number | boolean | string[] | null>>(defaultValues);
   const authContext = useContext(AuthContext);
   const user = authContext?.user;
+
+  // Fetch IED values from database if iedKey is provided
+  useEffect(() => {
+    async function fetchIedFromDb() {
+      if (user && iedKey) {
+        const { getIeds } = await import('../../services/iedService');
+        const ieds = await getIeds(user.uid);
+        if (ieds && ieds[iedKey]) {
+          setFormValues({ ...defaultValues, ...ieds[iedKey] });
+        }
+      }
+    }
+    fetchIedFromDb();
+  }, [user, iedKey]);
 
   const handleChange = (field: string, value: string | number | boolean) => {
     setFormValues(prev => ({ ...prev, [field]: value }));
@@ -141,4 +155,6 @@ export default function IedForm({ iedKey, onDeleteForm }: IedFormProps) {
       </div>
     </div>
   );
-}
+};
+
+export default IedForm;

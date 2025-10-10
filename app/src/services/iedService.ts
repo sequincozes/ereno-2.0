@@ -3,23 +3,19 @@ import { ref, set, get, push } from 'firebase/database';
 import type { IedType } from '../types/iedType';
 import type { GroupType } from '../types/groupType';
 
-// Add a group to Firebase
-export async function addGroup(group: GroupType) {
-  const groupRef = push(ref(db, 'groups'));
+export async function addGroup(group: GroupType, uid: string) {
+  const groupRef = push(ref(db, `${uid}/groups`));
   await set(groupRef, group);
   return groupRef.key;
 }
-
-// TODO I need to adapte to auth logic
-export async function getGroups() {
-  const snapshot = await get(ref(db, 'groups'));
+export async function getGroups(uid: string) {
+  const snapshot = await get(ref(db, `${uid}/groups`));
   return snapshot.exists() ? snapshot.val() : {};
 }
 
-// TODO I need to adapte to auth logic
-export async function deleteGroup(groupKey: string) {
-  await set(ref(db, `groups/${groupKey}`), null);
-} 
+export async function deleteGroup(groupKey: string, uid: string) {
+  await set(ref(db, `${uid}/groups/${groupKey}`), null);
+}
 
 export async function addIed(ied: IedType, uid: string) {
   const iedRef = push(ref(db, `${uid}/iedConfigs`));
@@ -29,7 +25,7 @@ export async function addIed(ied: IedType, uid: string) {
 
 export async function getIeds(uid: string) {
   const snapshot = await get(ref(db, `${uid}/iedConfigs`));
-  return snapshot.exists() ? snapshot.val() : {};
+  return snapshot.val();
 }
 
 export async function deleteIed(iedKey: string, uid: string) {
