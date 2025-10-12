@@ -12,13 +12,13 @@ export default function DownloadDataset() {
     const authContext = useContext(AuthContext);
     const user = authContext?.user;
     const [JsonName, setJsonName] = useState("");
+    const [numberExperiments, setNumberExperiments] = useState("");
 
     const moveToLastPage = () => {
         window.location.href = '/attackConfig';
     }
 
     async function handleJsonDownload() {
-        // Fetch all config data
         if (!user) {
             alert('User not authenticated!');
             return;
@@ -28,6 +28,9 @@ export default function DownloadDataset() {
         const attackConfigs = await getAttackConfigs(user.uid);
         const config = {
             JsonName,
+            experiment : {
+                count: Number(numberExperiments)
+            },
             ieds,
             gooseFlows,
             attackConfigs
@@ -65,7 +68,7 @@ export default function DownloadDataset() {
                         JSON Download
                     </h3>
                     <p className="text-gray-600 mb-4">
-                        Configure the file format of the dataset
+                        Configure the name and the number of experiments for the dataset as a JSON file
                     </p>
                     <div className="flex flex-row gap-8">
                         <div className="flex-1 min-w-[200px]">
@@ -76,6 +79,16 @@ export default function DownloadDataset() {
                                 onChange={e => setJsonName(e.target.value)}
                                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500"
                                 placeholder="e.g., JSON_01"
+                            />
+                        </div>
+                        <div className="flex-1 min-w-[200px]">
+                            <label className="block text-sm font-medium text-gray-700">How many times to repeat the experiment <span className="text-red-600">*</span></label>
+                            <input
+                                type="number"
+                                value={numberExperiments}
+                                onChange={e => setNumberExperiments(e.target.value)}
+                                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500"
+                                placeholder="e.g., 1"
                             />
                         </div>
                     </div>
