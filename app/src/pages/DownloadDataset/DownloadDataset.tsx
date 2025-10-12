@@ -1,19 +1,17 @@
 import Header from "../../components/common/Header";
 import { Target as IconTarget } from "lucide-react";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
-import Modal from "../../components/feedback/Modal"
 import { getIeds } from '../../services/iedService';
 import { getGooseFlows } from '../../services/gooseFlowService';
 import { getAttackConfigs } from '../../services/attackConfigService';
+import AuthContext from '../../context/authContext';
 
-export default function DowloadDataset() {
+export default function DownloadDataset() {
 
-    const [showModal, setShowModal] = useState(false);
-    const [fileFormat, setFileFormat] = useState(".CSV");
-    const [goose, setGoose] = useState(true);
-    const [sv, setSv] = useState(false);
-    const [datasetName, setDatasetName] = useState("");
+    const authContext = useContext(AuthContext);
+    const user = authContext?.user;
+    const [JsonName, setJsonName] = useState("");
 
     const moveToLastPage = () => {
         window.location.href = '/attackConfig';
@@ -21,16 +19,15 @@ export default function DowloadDataset() {
 
     async function handleJsonDownload() {
         // Fetch all config data
-        const ieds = await getIeds();
-        const gooseFlows = await getGooseFlows();
-        const attackConfigs = await getAttackConfigs();
+        if (!user) {
+            alert('User not authenticated!');
+            return;
+        }
+        const ieds = await getIeds(user.uid);
+        const gooseFlows = await getGooseFlows(user.uid);
+        const attackConfigs = await getAttackConfigs(user.uid);
         const config = {
-            datasetName,
-            fileFormat,
-            messageTypes: {
-                goose,
-                sv
-            },
+            JsonName,
             ieds,
             gooseFlows,
             attackConfigs
@@ -40,15 +37,12 @@ export default function DowloadDataset() {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = (datasetName || 'dataset') + '.json';
+        a.download = (JsonName || 'dataset') + '.json';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        setShowModal(true);
     }
-
-    const fileFormats = [".CSV", ".PCAP", ".ARFF"];
 
     return(
         <main className="min-h-screen bg-[#ECF0FF] flex flex-col">
@@ -78,34 +72,11 @@ export default function DowloadDataset() {
                             <label className="block text-sm font-medium text-gray-700">Name <span className="text-red-600">*</span></label>
                             <input
                                 type="text"
-                                value={datasetName}
-                                onChange={e => setDatasetName(e.target.value)}
+                                value={JsonName}
+                                onChange={e => setJsonName(e.target.value)}
                                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500"
-                                placeholder="e.g., Dataset_01"
+                                placeholder="e.g., JSON_01"
                             />
-                        </div>
-                        <div className="flex-1 min-w-[200px]">
-                            <label className="block text-sm font-medium text-gray-700">File Format <span className="text-red-600">*</span></label>
-                            <select
-                                value={fileFormat}
-                                onChange={e => setFileFormat(e.target.value)}
-                                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500"
-                            >
-                                {fileFormats.map(fmt => (
-                                    <option key={fmt} value={fmt}>{fmt}</option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className="flex-1 min-w-[200px]">
-                            <span className="block text-sm font-medium text-gray-700">Add type of message (GOOSE by default) <span className="text-red-600">*</span></span>
-                            <div className="flex items-center">
-                                <input type="checkbox" checked={goose} onChange={e => setGoose(e.target.checked)} />
-                                <label className="ml-2">GOOSE messages</label>
-                            </div>
-                            <div className="flex items-center">
-                                <input type="checkbox" checked={sv} onChange={e => setSv(e.target.checked)} />
-                                <label className="ml-2">SV messages</label>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -120,7 +91,6 @@ export default function DowloadDataset() {
                     onClick={handleJsonDownload}>
                     JSON download
                 </button>
-                {showModal && <Modal title="Dataset Created!" content="The dataset will be created." />}
             </footer>
         </main>
     );
