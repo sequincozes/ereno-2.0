@@ -12,3 +12,8 @@ export async function getAttackConfigs(uid: string) {
   const snapshot = await get(ref(db, `${uid}/attackConfigs`));
   return snapshot.exists() ? snapshot.val() : {};
 }
+
+export async function deleteAttackConfig(attackConfigId: string, uid: string) {
+  const attackRef = ref(db, `${uid}/attackConfigs/${attackConfigId}`);
+  await set(attackRef, null);
+}

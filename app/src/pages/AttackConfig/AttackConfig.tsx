@@ -36,7 +36,7 @@ export default function AttackConfig() {
             </div>
             <hr className="border border-gray-200" />
 
-            {/* Content */}
+            {/* Content */}     
             <div className="flex px-8 py-6 flex-col">
                 <div className="bg-white rounded-md shadow p-6">
                     <h3 className="flex items-center gap-2 text-[#0051A2] text-lg mb-1 font-bold">
