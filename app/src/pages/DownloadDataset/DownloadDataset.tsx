@@ -56,7 +56,7 @@ export default function DownloadDataset() {
                 <Link to="/iedconfig" className="text-gray-600 hover:underline cursor-pointer">IED Config</Link>
                 <Link to="/gooseFlow" className="text-gray-600 hover:underline cursor-pointer">GOOSE Flow Config</Link>
                 <Link to="/attackConfig" className="text-gray-600 hover:underline cursor-pointer">Attack Config</Link>
-                <span className="text-[#0051A2]">Download Dataset</span>
+                <span className="text-[#0051A2]">Download JSON</span>
             </div>
             <hr className="border border-gray-200" />
 

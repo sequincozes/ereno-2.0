@@ -15,7 +15,6 @@ const IedForm: React.FC<IedFormProps> = ({ iedKey, onDeleteForm }) => {
   const authContext = useContext(AuthContext);
   const user = authContext?.user;
 
-  // Fetch IED values from database if iedKey is provided
   useEffect(() => {
     async function fetchIedFromDb() {
       if (user && iedKey) {

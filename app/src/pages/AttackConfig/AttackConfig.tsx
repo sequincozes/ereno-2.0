@@ -32,7 +32,7 @@ export default function AttackConfig() {
                 <Link to="/iedconfig" className="text-gray-600 hover:underline cursor-pointer">IED Config</Link>
                 <Link to="/gooseFlow" className="text-gray-600 hover:underline cursor-pointer">GOOSE Flow Config</Link>
                 <span className="text-[#0051A2]">Attack Config</span>
-                <Link to="/downloadDataset" className="text-gray-600 hover:underline cursor-pointer">Download Dataset</Link>
+                <Link to="/downloadDataset" className="text-gray-600 hover:underline cursor-pointer">Download JSON</Link>
             </div>
             <hr className="border border-gray-200" />
 

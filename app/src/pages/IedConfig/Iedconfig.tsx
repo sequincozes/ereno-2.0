@@ -43,7 +43,7 @@ export default function IedConfig() {
         <span className="text-[#0051A2]">IED Config</span>
         <Link to="/gooseFlow" className="text-gray-600 hover:underline cursor-pointer">GOOSE Flow Config</Link>
         <Link to="/attackConfig" className="text-gray-600 hover:underline cursor-pointer">Attack Config</Link>
-        <Link to="/downloadDataset" className="text-gray-600 hover:underline cursor-pointer">Download Dataset</Link>
+        <Link to="/downloadDataset" className="text-gray-600 hover:underline cursor-pointer">Download JSON</Link>
       </div>
       <hr className="border border-gray-200" />
 
