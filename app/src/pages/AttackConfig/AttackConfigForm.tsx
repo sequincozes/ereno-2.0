@@ -1,7 +1,7 @@
 import { useContext, useState, useEffect } from "react";
 import attackData from "../../data/attacks_properties.json";
 import { Trash2 as IconTrash, Save as IconSave } from "lucide-react";
-import { addAttackConfig, deleteAttackConfig } from '../../services/attackConfigService';
+import { addAttackConfig,  deleteAttackConfig} from '../../services/attackConfigService';
 import { buildNestedAttackObject } from '../../utils/attackObjectBuilder';
 import { formatAttackInputLabel } from '../../utils/formatAttackInputLabel';
 import AuthContext from "../../context/authContext";
@@ -64,6 +64,7 @@ export default function AttackForm({ attackIndex, onDelete }: AttackFormProps) {
       // Build nested attack object with selectedAttack as dynamic key
       const nestedAttack = buildNestedAttackObject(paramValues, selectedAttack);
       const attackToSave = {
+        targetGroup: selectedGroup,
         category: selectedCategory,
         specificAttack: selectedAttack,
         parameters: nestedAttack,
@@ -104,7 +105,7 @@ export default function AttackForm({ attackIndex, onDelete }: AttackFormProps) {
       <div className="flex flex-col gap-4">
         {/* Target Group */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Target Group</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Target IED</label>
           <select
             value={selectedGroup}
             onChange={e => setSelectedGroup(e.target.value)}
