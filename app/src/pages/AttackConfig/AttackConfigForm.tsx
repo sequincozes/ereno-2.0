@@ -5,13 +5,14 @@ import { addAttackConfig } from '../../services/attackConfigService';
 import { buildNestedAttackObject } from '../../utils/attackObjectBuilder';
 import { formatAttackInputLabel } from '../../utils/formatAttackInputLabel';
 import AuthContext from "../../context/authContext";
-import { getIeds } from "../../services/iedService";
+import { getIeds, getGroups } from "../../services/iedService";
 import type { AttackFormProps, AttackParameter } from "../../types/attackConfigType";
 
 export default function AttackForm({ attackIndex, onDelete }: AttackFormProps) {
   const attackCategories = Object.keys(attackData.attacks);
 
   const [compromisedGroups, setCompromisedGroups] = useState<string[]>([]);
+  const [userGroups, setUserGroups] = useState<string[]>([]);
   const [selectedGroup, setSelectedGroup] = useState<string>("");
   const [selectedCategory, setSelectedCategory] = useState(attackCategories[0] || "");
   const [selectedAttack, setSelectedAttack] = useState("");
@@ -29,18 +30,28 @@ export default function AttackForm({ attackIndex, onDelete }: AttackFormProps) {
   const authContext = useContext(AuthContext);
   const user = authContext?.user;
 
-  // Fetch IEDs to populate compromised groups
+  // Fetch IEDs and Groups to populate compromisedGroups
   useEffect(() => {
-    async function fetchIeds() {
+    async function fetchIedsAndGroups() {
       if (user) {
         const ieds = await getIeds(user.uid);
+        let iedNames: string[] = [];
         if (ieds) {
           const iedsFounded = Object.values(ieds);
-          setCompromisedGroups((iedsFounded as { name: string }[]).map((ied: { name: string }) => ied.name));
+          iedNames = (iedsFounded as { name: string }[]).map((ied: { name: string }) => ied.name);
+        }
+        setCompromisedGroups(iedNames);
+
+        // Busca grupos do usuário
+        const groups = await getGroups(user.uid);
+        if (groups && typeof groups === "object") {
+          setUserGroups(Object.values(groups).map((g) => (g as import("../../types/groupType").GroupType).name));
+        } else {
+          setUserGroups([]);
         }
       }
     }
-    fetchIeds();
+    fetchIedsAndGroups();
   }, [user]);
 
   useEffect(() => {
@@ -107,7 +118,7 @@ export default function AttackForm({ attackIndex, onDelete }: AttackFormProps) {
             onChange={e => setSelectedGroup(e.target.value)}
             className="w-full border rounded px-3 py-2"
           >
-            {compromisedGroups.map(g => (
+            {[...compromisedGroups, ...userGroups].map(g => (
               <option key={g} value={g}>{g}</option>
             ))}
           </select>

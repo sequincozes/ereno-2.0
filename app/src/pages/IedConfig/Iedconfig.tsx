@@ -10,7 +10,7 @@ import AuthContext from '../../context/authContext';
 
 export default function IedConfig() {
   const [iedForms, setIedForms] = useState<string[]>([]);
-  const [showGroupForm, setShowGroupForm] = useState(false);
+  const [groupForms, setGroupForms] = useState<string[]>([]);
   const authContext = useContext(AuthContext);
   const user = authContext?.user;
 
@@ -21,6 +21,10 @@ export default function IedConfig() {
   const handleAddIed = () => {
     setIedForms(prev => [...prev, Date.now().toString()]);
   };
+
+  const handleAddGroup = () => {
+    setGroupForms(prev => [...prev, Date.now().toString()]);
+  }
 
   // Fetch saved IEDs on mount
   useEffect(() => {
@@ -86,11 +90,17 @@ export default function IedConfig() {
             Organize IEDs into groups for attack application
           </p>
           <button className="bg-blue-500 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded"
-            onClick={() => setShowGroupForm(true)}>
+            onClick={handleAddGroup}>
             + Add Group
           </button>
 
-          {showGroupForm && <GroupForm />}
+          {/* Render each Group form below the previous one */}
+          {groupForms.map((id) => (
+            <GroupForm
+              groupIndex={id}
+              onDeleteForm={() => setGroupForms(prev => prev.filter(formId => formId !== id))}
+            />
+          ))}
         </div>
       </div>
 
