@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect, useMemo } from "react";
 import attackData from "../../data/attacks_properties.json";
 import { Trash2 as IconTrash, Save as IconSave } from "lucide-react";
 import { addAttackConfig } from '../../services/attackConfigService';
@@ -6,18 +6,7 @@ import { buildNestedAttackObject } from '../../utils/attackObjectBuilder';
 import { formatAttackInputLabel } from '../../utils/formatAttackInputLabel';
 import AuthContext from "../../context/authContext";
 import { getIeds } from "../../services/iedService";
-
-type AttackParameter = {
-  name: string;
-  type: string | string[];
-  defaultValue: string | number | boolean;
-  hint?: string;
-};
-
-interface AttackFormProps {
-  attackIndex: number;
-  onDelete: () => void;
-}
+import type { AttackFormProps, AttackParameter } from "../../types/attackConfigType";
 
 export default function AttackForm({ attackIndex, onDelete }: AttackFormProps) {
   const attackCategories = Object.keys(attackData.attacks);
@@ -31,9 +20,11 @@ export default function AttackForm({ attackIndex, onDelete }: AttackFormProps) {
   const specificAttacks = selectedCategory
     ? Object.keys((attackData.attacks as { [category: string]: { [attackName: string]: { parameters: AttackParameter[] } } })[selectedCategory] || {})
     : [];
-  const attackParams = selectedCategory && selectedAttack
-    ? ((attackData.attacks as { [category: string]: { [attackName: string]: { parameters: AttackParameter[] } } })[selectedCategory]?.[selectedAttack]?.parameters || [])
-    : [];
+  const attackParams = useMemo(() => {
+    return selectedCategory && selectedAttack
+      ? ((attackData.attacks as { [category: string]: { [attackName: string]: { parameters: AttackParameter[] } } })[selectedCategory]?.[selectedAttack]?.parameters || [])
+      : [];
+  }, [selectedCategory, selectedAttack]);
 
   const authContext = useContext(AuthContext);
   const user = authContext?.user;
@@ -61,7 +52,7 @@ export default function AttackForm({ attackIndex, onDelete }: AttackFormProps) {
   useEffect(() => {
     if (attackParams.length > 0) {
       const initialValues: Record<string, string | number | boolean> = {};
-      attackParams.forEach(param => {
+  attackParams.forEach((param: AttackParameter) => {
         initialValues[param.name] = param.defaultValue;
       });
       setParamValues(initialValues);
@@ -75,7 +66,7 @@ export default function AttackForm({ attackIndex, onDelete }: AttackFormProps) {
   const handleSaveAttackConfig = async () => {
     try {
       const allParamValues: Record<string, string | number | boolean> = { ...paramValues };
-      attackParams.forEach(param => {
+  attackParams.forEach((param: AttackParameter) => {
         if (allParamValues[param.name] === undefined) {
           allParamValues[param.name] = param.defaultValue;
         }
@@ -161,8 +152,12 @@ export default function AttackForm({ attackIndex, onDelete }: AttackFormProps) {
                   <select
                     value={
                       paramValues[param.name] !== undefined
-                        ? String(paramValues[param.name])
-                        : String(param.defaultValue)
+                        ? typeof paramValues[param.name] === "boolean"
+                          ? paramValues[param.name] ? "true" : "false"
+                          : String(paramValues[param.name])
+                        : typeof param.defaultValue === "boolean"
+                          ? param.defaultValue ? "true" : "false"
+                          : String(param.defaultValue)
                     }
                     onChange={e => handleParamChange(param.name, e.target.value)}
                     className="border rounded px-2 py-1"
@@ -184,11 +179,19 @@ export default function AttackForm({ attackIndex, onDelete }: AttackFormProps) {
                     value={
                       paramValues[param.name] !== undefined
                         ? param.type === "int"
-                          ? paramValues[param.name]
-                          : String(paramValues[param.name])
+                          ? typeof paramValues[param.name] === "number" || typeof paramValues[param.name] === "string"
+                            ? String(paramValues[param.name])
+                            : ""
+                          : typeof paramValues[param.name] === "string" || typeof paramValues[param.name] === "number"
+                            ? String(paramValues[param.name])
+                            : ""
                         : param.type === "int"
-                          ? param.defaultValue
-                          : String(param.defaultValue)
+                          ? typeof param.defaultValue === "number" || typeof param.defaultValue === "string"
+                            ? String(param.defaultValue)
+                            : ""
+                          : typeof param.defaultValue === "string" || typeof param.defaultValue === "number"
+                            ? String(param.defaultValue)
+                            : ""
                     }
                     onChange={e => handleParamChange(param.name, param.type === "int" ? Number(e.target.value) : e.target.value)}
                     className="border rounded px-2 py-1"

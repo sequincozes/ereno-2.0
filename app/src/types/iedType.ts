@@ -9,3 +9,7 @@ export interface IedType {
   stNum: number;
   sqNum: number;
 }
+export interface IedFormProps {
+  iedKey?: string;
+  onDeleteForm?: () => void;
+}

@@ -3,11 +3,7 @@ import iedData from "../../data/ied_properties.json";
 import { Trash2 as IconTrash, Copy as IconCopy, Save as IconSave } from "lucide-react";
 import { addIed, deleteIed } from '../../services/iedService';
 import AuthContext from "../../context/authContext";
-
-interface IedFormProps {
-  iedKey?: string;
-  onDeleteForm?: () => void;
-}
+import type { IedFormProps } from "../../types/iedType";
 
 const IedForm: React.FC<IedFormProps> = ({ iedKey, onDeleteForm }) => {
   const { parameters, defaultValues } = iedData;
@@ -36,6 +32,7 @@ const IedForm: React.FC<IedFormProps> = ({ iedKey, onDeleteForm }) => {
   const handleDeleteIed = async () => {
     if (iedKey && user) {
       await deleteIed(iedKey, user.uid);
+      alert('IED deleted successfully!');
     }
     if (onDeleteForm) {
       onDeleteForm();
