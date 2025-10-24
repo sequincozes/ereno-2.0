@@ -9,7 +9,7 @@ import AuthContext from '../../context/authContext';
 
 
 export default function IedConfig() {
-  const [iedForms, setIedForms] = useState<string[]>([]);
+  const [iedForms, setIedForms] = useState<Array<{ id: string; initialValues?: Record<string, string | number | boolean | string[] | null> }>>([]);
   const [groupForms, setGroupForms] = useState<string[]>([]);
   const authContext = useContext(AuthContext);
   const user = authContext?.user;
@@ -19,7 +19,7 @@ export default function IedConfig() {
   };
 
   const handleAddIed = () => {
-    setIedForms(prev => [...prev, Date.now().toString()]);
+    setIedForms(prev => [...prev, { id: Date.now().toString() }]);
   };
 
   const handleAddGroup = () => {
@@ -32,11 +32,16 @@ export default function IedConfig() {
       if (!user) return;
       const ieds = await getIeds(user.uid);
       if (ieds && typeof ieds === 'object') {
-        setIedForms(Object.keys(ieds));
+        setIedForms(Object.keys(ieds).map(k => ({ id: k })));
       }
     }
     fetchIeds();
-  }, []);
+  }, [user]);
+
+  // create a new unsaved form prefilled with values
+  const handleCopyIed = (values: Record<string, string | number | boolean | string[] | null>) => {
+    setIedForms(prev => [...prev, { id: Date.now().toString(), initialValues: values }]);
+  };
 
   return (
     <main className="min-h-screen  bg-[#ECF0FF] flex flex-col">
@@ -71,11 +76,13 @@ export default function IedConfig() {
           </div>
 
           {/* Render each IED form below the previous one */}
-          {iedForms.map((id) => (
+          {iedForms.map((form) => (
             <IedForm
-              key={id}
-              iedKey={id}
-              onDeleteForm={() => setIedForms(prev => prev.filter(formId => formId !== id))}
+              key={form.id}
+              iedKey={form.initialValues ? undefined : form.id}
+              initialValues={form.initialValues}
+              onCopy={handleCopyIed}
+              onDeleteForm={() => setIedForms(prev => prev.filter(f => f.id !== form.id))}
             />
           ))}
 

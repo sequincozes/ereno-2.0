@@ -5,14 +5,15 @@ import { addIed, deleteIed } from '../../services/iedService';
 import AuthContext from "../../context/authContext";
 import type { IedFormProps } from "../../types/iedType";
 
-const IedForm: React.FC<IedFormProps> = ({ iedKey, onDeleteForm }) => {
+const IedForm: React.FC<IedFormProps> = ({ iedKey, onDeleteForm, initialValues, onCopy }) => {
   const { parameters, defaultValues } = iedData;
-  const [formValues, setFormValues] = useState<Record<string, string | number | boolean | string[] | null>>(defaultValues);
+  const [formValues, setFormValues] = useState<Record<string, string | number | boolean | string[] | null>>(initialValues ? { ...defaultValues, ...initialValues } : defaultValues);
   const authContext = useContext(AuthContext);
   const user = authContext?.user;
 
   useEffect(() => {
     async function fetchIedFromDb() {
+      // If iedKey provided, load from DB (edit existing)
       if (user && iedKey) {
         const { getIeds } = await import('../../services/iedService');
         const ieds = await getIeds(user.uid);
@@ -21,8 +22,13 @@ const IedForm: React.FC<IedFormProps> = ({ iedKey, onDeleteForm }) => {
         }
       }
     }
-    fetchIedFromDb();
-  }, [user, iedKey]);
+    // If initialValues provided and there's no iedKey (it's a copied/unsaved form), prefer initialValues
+    if (!iedKey && initialValues) {
+      setFormValues({ ...defaultValues, ...initialValues });
+    } else {
+      fetchIedFromDb();
+    }
+  }, [user, iedKey, initialValues, defaultValues]);
 
   const handleChange = (field: string, value: string | number | boolean) => {
     setFormValues(prev => ({ ...prev, [field]: value }));
@@ -133,7 +139,14 @@ const IedForm: React.FC<IedFormProps> = ({ iedKey, onDeleteForm }) => {
           </button>
           <button
             type="button"
-            onClick={() => navigator.clipboard.writeText(JSON.stringify(formValues))}
+            onClick={() => {
+              if (onCopy) {
+                onCopy(formValues);
+              } else {
+                navigator.clipboard.writeText(JSON.stringify(formValues));
+                alert('Copied IED values to clipboard');
+              }
+            }}
             className="p-2 rounded border border-blue-300 bg-blue-100 text-blue-600 hover:bg-blue-200"
             title="Copiar"
           >
