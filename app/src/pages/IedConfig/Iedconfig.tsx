@@ -43,6 +43,10 @@ export default function IedConfig() {
     setIedForms(prev => [...prev, { id: Date.now().toString(), initialValues: values }]);
   };
 
+  const handleIedSaved = (localId: string, newKey: string) => {
+    setIedForms(prev => prev.map(f => f.id === localId ? { id: newKey } : f));
+  };
+
   return (
     <main className="min-h-screen  bg-[#ECF0FF] flex flex-col">
       <Header />
@@ -82,6 +86,8 @@ export default function IedConfig() {
               iedKey={form.initialValues ? undefined : form.id}
               initialValues={form.initialValues}
               onCopy={handleCopyIed}
+              localId={form.id}
+              onSave={handleIedSaved}
               onDeleteForm={() => setIedForms(prev => prev.filter(f => f.id !== form.id))}
             />
           ))}

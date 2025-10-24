@@ -1,12 +1,13 @@
 import { useContext, useState, useEffect } from "react";
 import gooseData from "../../data/goose_properties.json";
 import { Save as IconSave } from "lucide-react";
-import { addGooseFlow } from '../../services/gooseFlowService';
+import { addGooseFlow, updateGooseFlow } from '../../services/gooseFlowService';
 import AuthContext from "../../context/authContext";
 
 const GooseFlowForm = () => {
   const { parameters, defaultValues } = gooseData;
   const [formValues, setFormValues] = useState<Record<string, string | number | boolean>>(defaultValues);
+  const [gooseKey, setGooseKey] = useState<string | null>(null);
   const authContext = useContext(AuthContext);
   const user = authContext?.user;
 
@@ -18,7 +19,9 @@ useEffect(() => {
       if (gooseFlows && typeof gooseFlows === 'object') {
         const keys = Object.keys(gooseFlows);
         if (keys.length > 0) {
-          const firstGooseFlow = gooseFlows[keys[0]];
+          const firstKey = keys[0];
+          const firstGooseFlow = gooseFlows[firstKey];
+          setGooseKey(firstKey);
           setFormValues({ ...defaultValues, ...firstGooseFlow });
         }
       }
@@ -59,8 +62,14 @@ useEffect(() => {
         alert('User not authenticated!');
         return;
       }
-      await addGooseFlow(gooseToSave, user.uid);
-      alert('GOOSE Flow saved successfully!');
+      if (gooseKey) {
+        await updateGooseFlow(gooseKey, gooseToSave as any, user.uid);
+        alert('GOOSE Flow updated successfully!');
+      } else {
+        const newKey = await addGooseFlow(gooseToSave, user.uid);
+        setGooseKey(newKey ?? null);
+        alert('GOOSE Flow saved successfully!');
+      }
     } catch {
       alert('Error saving GOOSE Flow!');
     }

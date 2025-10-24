@@ -1,11 +1,11 @@
 import { useContext, useState, useEffect } from "react";
 import iedData from "../../data/ied_properties.json";
 import { Trash2 as IconTrash, Copy as IconCopy, Save as IconSave } from "lucide-react";
-import { addIed, deleteIed } from '../../services/iedService';
+import { addIed, deleteIed, updateIed } from '../../services/iedService';
 import AuthContext from "../../context/authContext";
 import type { IedFormProps } from "../../types/iedType";
 
-const IedForm: React.FC<IedFormProps> = ({ iedKey, onDeleteForm, initialValues, onCopy }) => {
+const IedForm: React.FC<IedFormProps> = ({ iedKey, onDeleteForm, initialValues, onCopy, localId, onSave }) => {
   const { parameters, defaultValues } = iedData;
   const [formValues, setFormValues] = useState<Record<string, string | number | boolean | string[] | null>>(initialValues ? { ...defaultValues, ...initialValues } : defaultValues);
   const authContext = useContext(AuthContext);
@@ -63,9 +63,20 @@ const IedForm: React.FC<IedFormProps> = ({ iedKey, onDeleteForm, initialValues, 
         alert('User not authenticated!');
         return;
       }
-      await addIed(iedToSave, user.uid);
-      alert('IED saved successfully!');
-    } catch {
+      if (iedKey) {
+        // update existing
+        await updateIed(iedKey, iedToSave, user.uid);
+        alert('IED updated successfully!');
+      } else {
+        // create new
+        const newKey = await addIed(iedToSave, user.uid);
+        alert('IED saved successfully!');
+        if (onSave && localId) {
+          onSave(localId, newKey || "");
+        }
+      }
+    } catch (err) {
+      console.error('handleSaveIed error', err);
       alert('Error saving IED!');
     }
   };

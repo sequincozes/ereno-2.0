@@ -12,3 +12,7 @@ export async function getGooseFlows(uid: string) {
   const snapshot = await get(ref(db, `${uid}/gooseFlows`));
   return snapshot.exists() ? snapshot.val() : {};
 }
+
+export async function updateGooseFlow(gooseKey: string, gooseFlow: GooseFlowType, uid: string) {
+  await set(ref(db, `${uid}/gooseFlows/${gooseKey}`), gooseFlow);
+}

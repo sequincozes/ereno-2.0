@@ -23,6 +23,10 @@ export async function addIed(ied: IedType, uid: string) {
   return iedRef.key;
 }
 
+export async function updateIed(iedKey: string, ied: IedType, uid: string) {
+  await set(ref(db, `${uid}/iedConfigs/${iedKey}`), ied);
+}
+
 export async function getIeds(uid: string) {
   const snapshot = await get(ref(db, `${uid}/iedConfigs`));
   return snapshot.val();
