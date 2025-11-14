@@ -8,4 +8,14 @@ export interface GooseFlowType {
   ndsCom: boolean;
   Test: boolean;
   cbStatus: boolean;
+  message: {
+    count: number;
+  };
+  sv: {
+    per: {
+      goose: {
+        multiplier: number;
+      };
+    };
+  };
 }

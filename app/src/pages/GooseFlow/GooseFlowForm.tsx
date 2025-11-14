@@ -3,6 +3,7 @@ import gooseData from "../../data/goose_properties.json";
 import { Save as IconSave } from "lucide-react";
 import { addGooseFlow, updateGooseFlow } from '../../services/gooseFlowService';
 import AuthContext from "../../context/authContext";
+import type { GooseFlowType } from '../../types/gooseFlowType';
 
 const GooseFlowForm = () => {
   const { parameters, defaultValues } = gooseData;
@@ -28,7 +29,7 @@ useEffect(() => {
     }
   }
   fetchGooseFlowFromDb();
-}, [user]);
+}, [user, defaultValues]);
 
   const handleChange = (field: string, value: string | number | boolean) => {
     setFormValues((prev: Record<string, string | number | boolean>) => ({ ...prev, [field]: value }));
@@ -63,10 +64,10 @@ useEffect(() => {
         return;
       }
       if (gooseKey) {
-        await updateGooseFlow(gooseKey, gooseToSave as any, user.uid);
+        await updateGooseFlow(gooseKey, gooseToSave as GooseFlowType, user.uid);
         alert('GOOSE Flow updated successfully!');
       } else {
-        const newKey = await addGooseFlow(gooseToSave, user.uid);
+        const newKey = await addGooseFlow(gooseToSave as GooseFlowType, user.uid);
         setGooseKey(newKey ?? null);
         alert('GOOSE Flow saved successfully!');
       }
