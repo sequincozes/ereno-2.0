@@ -9,7 +9,7 @@ import AuthContext from '../../context/authContext';
 
 
 export default function IedConfig() {
-  const [iedForms, setIedForms] = useState<Array<{ id: string; initialValues?: Record<string, string | number | boolean | string[] | null> }>>([]);
+  const [iedForms, setIedForms] = useState<Array<{ id: string; initialValues?: Record<string, string | number | boolean | string[] | null>; isLocal?: boolean }>>([]);
   const [groupForms, setGroupForms] = useState<string[]>([]);
   const authContext = useContext(AuthContext);
   const user = authContext?.user;
@@ -19,7 +19,8 @@ export default function IedConfig() {
   };
 
   const handleAddIed = () => {
-    setIedForms(prev => [...prev, { id: Date.now().toString() }]);
+    // mark as local so saving will create (push) instead of update
+    setIedForms(prev => [...prev, { id: `local-${Date.now().toString()}`, isLocal: true }]);
   };
 
   const handleAddGroup = () => {
@@ -32,7 +33,8 @@ export default function IedConfig() {
       if (!user) return;
       const ieds = await getIeds(user.uid);
       if (ieds && typeof ieds === 'object') {
-        setIedForms(Object.keys(ieds).map(k => ({ id: k })));
+        // keys from DB are real DB keys (push keys), mark them as non-local
+        setIedForms(Object.keys(ieds).map(k => ({ id: k, isLocal: false })));
       }
     }
     fetchIeds();
@@ -40,11 +42,12 @@ export default function IedConfig() {
 
   // create a new unsaved form prefilled with values
   const handleCopyIed = (values: Record<string, string | number | boolean | string[] | null>) => {
-    setIedForms(prev => [...prev, { id: Date.now().toString(), initialValues: values }]);
+    // copy creates a local unsaved form
+    setIedForms(prev => [...prev, { id: `local-${Date.now().toString()}`, isLocal: true, initialValues: values }]);
   };
 
   const handleIedSaved = (localId: string, newKey: string) => {
-    setIedForms(prev => prev.map(f => f.id === localId ? { id: newKey } : f));
+    setIedForms(prev => prev.map(f => f.id === localId ? { id: newKey, isLocal: false } : f));
   };
 
   return (
@@ -83,7 +86,8 @@ export default function IedConfig() {
           {iedForms.map((form) => (
             <IedForm
               key={form.id}
-              iedKey={form.initialValues ? undefined : form.id}
+              // only pass iedKey when this form represents an existing DB entry
+              iedKey={form.isLocal ? undefined : form.id}
               initialValues={form.initialValues}
               onCopy={handleCopyIed}
               localId={form.id}
