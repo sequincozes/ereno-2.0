@@ -125,7 +125,12 @@ public class ActionConfigLoader {
                     actionConfig = gson.fromJson(reader, JsonObject.class);
                 }
             } else {
-                throw new IOException("Action config file path is required in main config");
+                LOGGER.info(() -> "No actionConfigFile declared; using main config file as the action config: "
+                        + mainConfigPath);
+                try (FileReader reader = new FileReader(mainConfigPath)) {
+                    Gson gson = new Gson();
+                    actionConfig = gson.fromJson(reader, JsonObject.class);
+                }
             }
         }
 
