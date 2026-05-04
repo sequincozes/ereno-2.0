@@ -131,6 +131,7 @@ public class ActionConfigLoader {
                     Gson gson = new Gson();
                     actionConfig = gson.fromJson(reader, JsonObject.class);
                 }
+                mainConfig.actionConfigFile = mainConfigPath;
             }
         }
 
