@@ -97,6 +97,17 @@ public class CSVWritter {
         write(header);
     }
 
+    public static void writeGooseOnlyHeader() throws IOException {
+        String header = String.join(",", new String[] {
+                "t", "GooseTimestamp", "SqNum", "StNum", "cbStatus", "frameLen", "ethDst", "ethSrc", "ethType",
+                "gooseTimeAllowedtoLive", "gooseAppid", "gooseLen", "TPID", "gocbRef", "datSet", "goID", "test",
+                "confRev", "ndsCom", "numDatSetEntries", "APDUSize", "protocol", "stDiff", "sqDiff",
+                "gooseLengthDiff", "cbStatusDiff", "apduSizeDiff", "frameLengthDiff", "timestampDiff", "tDiff",
+                "timeFromLastChange", "e2eLatency", "receivedTimestamp", "class"
+        });
+        write(header);
+    }
+
     public static void finishWriting() throws IOException {
         BufferedWriter writer = THREAD_WRITER.get();
         if (writer != null) {

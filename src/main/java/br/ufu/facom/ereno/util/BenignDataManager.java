@@ -47,7 +47,7 @@ public class BenignDataManager {
      * Saves benign GOOSE messages to a file in the configured directory.
      * Creates the directory if it doesn't exist.
      */
-    public static void saveBenignData(ArrayList<Goose> messages, String format) throws IOException {
+    public static String saveBenignData(ArrayList<Goose> messages, String format) throws IOException {
         String dirPath = ConfigLoader.benignData.benignDataDir;
         File dir = new File(dirPath);
         if (!dir.exists()) {
@@ -67,6 +67,7 @@ public class BenignDataManager {
         }
 
         LOGGER.info("Benign data saved successfully.");
+        return filepath;
     }
 
     /**
@@ -74,7 +75,7 @@ public class BenignDataManager {
      */
     private static void saveBenignDataCsv(ArrayList<Goose> messages, String filepath) throws IOException {
         CSVWritter.startWriting(filepath);
-        CSVWritter.writeDefaultHeader();
+        CSVWritter.writeGooseOnlyHeader();
         
         Goose prev = null;
         for (Goose gm : messages) {

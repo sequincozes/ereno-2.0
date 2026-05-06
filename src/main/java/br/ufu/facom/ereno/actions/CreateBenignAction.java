@@ -94,8 +94,7 @@ public class CreateBenignAction {
         // Save in requested formats
         for (String format : config.output.formats) {
             LOGGER.info(() -> "Saving benign data in " + format.toUpperCase() + " format...");
-            BenignDataManager.saveBenignData(ied.copyMessages(), format);
-            String savedPath = BenignDataManager.getBenignDataPath(format);
+            String savedPath = BenignDataManager.saveBenignData(ied.copyMessages(), format);
             LOGGER.info(() -> "Saved to: " + savedPath);
             
             // Track dataset creation

@@ -2,16 +2,16 @@
   "action": "create_attack_dataset",
   "description": "Generate labeled attack dataset from benign data",
   "input": {
-    "benignDataPath": "target/benign_data/42_5%fault_benign_data.arff",
+    "benignDataPath": "target\\benign_data\\648222204161500_5%fault_benign_data.csv",
     "verifyBenignData": true
   },
   "output": {
     "directory": "target/training",
-    "filename": "training_dataset.arff",
-    "format": "arff"
+    "filename": "training_dataset_mascarade.csv",
+    "format": "csv"
   },
   "datasetStructure": {
-    "messagesPerSegment": 100000,
+    "messagesPerSegment": 10000,
     "includeBenignSegment": true,
     "shuffleSegments": false
   },
@@ -30,7 +30,7 @@
     },
     {
       "name": "uc03_masquerade_fault",
-      "enabled": false,
+      "enabled": true,
       "attackConfig": "config/attacks/uc03_masquerade_fault.json",
       "description": "Masquerade fake fault attack"
     },
@@ -65,7 +65,7 @@
     },
     {
       "name": "uc10_delayed_replay",
-      "enabled": true,
+      "enabled": false,
       "attackConfig": "config/attacks/uc10_delayed_replay.json"
     },
     {
@@ -88,7 +88,7 @@
     }
   ],
   "gooseFlow": {
-    "numberOfMessages": 400000,
+    "numberOfMessages": 10000,
     "goID": "IntLockA",
     "ethSrc": "01:0c:cd:01:2f:80",
     "ethDst": "01:0c:cd:01:2f:81",
@@ -98,6 +98,16 @@
     "ndsCom": true,
     "test": true,
     "cbstatus": true
+  },
+  "setupIED": {
+    "iedName": "Protection IED",
+    "gocbRef": "LD/LLN0$GO$gcblA",
+    "datSet": "LD/LLN0$IntLockA",
+    "minTime": "4",
+    "maxTime": "1000",
+    "timestamp": "1",
+    "stNum": "1",
+    "sqNum": "1"
   },
   "devices": {
     "useCVariants": true

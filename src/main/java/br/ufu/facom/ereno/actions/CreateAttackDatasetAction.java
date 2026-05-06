@@ -68,6 +68,9 @@ public class CreateAttackDatasetAction {
         public OutputConfig output;
         public DatasetStructureConfig datasetStructure;
         public List<AttackSegmentConfig> attackSegments;
+        public GooseFlowConfig gooseFlow;
+        public SetupIEDConfig setupIED;
+        public DevicesConfig devices;
         
         public static class InputConfig {
             public String benignDataPath;
@@ -91,6 +94,34 @@ public class CreateAttackDatasetAction {
             public boolean shuffleSegments = false;
             public boolean binaryClassification = false; // If true, map all attacks to "attack" label
         }
+
+        public static class GooseFlowConfig {
+            public String goID;
+            public int numberOfMessages;
+            public String ethSrc;
+            public String ethDst;
+            public String ethType;
+            public String gooseAppid;
+            public String TPID;
+            public boolean ndsCom;
+            public boolean test;
+            public boolean cbstatus;
+        }
+
+        public static class SetupIEDConfig {
+            public String iedName;
+            public String gocbRef;
+            public String datSet;
+            public String minTime;
+            public String maxTime;
+            public String timestamp;
+            public String stNum;
+            public String sqNum;
+        }
+
+        public static class DevicesConfig {
+            public boolean useCVariants = true;
+        }
         
         public static class AttackSegmentConfig {
             public String name;
@@ -108,6 +139,7 @@ public class CreateAttackDatasetAction {
         
         // Load configuration
         Config config = loadConfig(configPath);
+        populateConfigLoader(config);
         
         // Verify benign data exists
         if (config.input.verifyBenignData) {
@@ -240,8 +272,7 @@ public class CreateAttackDatasetAction {
             }
             
             if (csvMode) {
-                // CSV mode not fully supported for segments yet, use ARFF
-                writeGooseMessagesToFile(segment.messages, isFirstSegment);
+                writeGooseMessagesCsv(segment.messages, isFirstSegment);
             } else {
                 writeGooseMessagesToFile(segment.messages, isFirstSegment);
             }
@@ -383,6 +414,40 @@ public class CreateAttackDatasetAction {
             return gson.fromJson(reader, Config.class);
         }
     }
+
+    private static void populateConfigLoader(Config config) {
+        if (config == null) {
+            return;
+        }
+
+        if (config.gooseFlow != null) {
+            ConfigLoader.gooseFlow.goID = config.gooseFlow.goID;
+            ConfigLoader.gooseFlow.numberOfMessages = config.gooseFlow.numberOfMessages;
+            ConfigLoader.gooseFlow.ethSrc = config.gooseFlow.ethSrc;
+            ConfigLoader.gooseFlow.ethDst = config.gooseFlow.ethDst;
+            ConfigLoader.gooseFlow.ethType = config.gooseFlow.ethType;
+            ConfigLoader.gooseFlow.gooseAppid = config.gooseFlow.gooseAppid;
+            ConfigLoader.gooseFlow.TPID = config.gooseFlow.TPID;
+            ConfigLoader.gooseFlow.ndsCom = config.gooseFlow.ndsCom;
+            ConfigLoader.gooseFlow.test = config.gooseFlow.test;
+            ConfigLoader.gooseFlow.cbstatus = config.gooseFlow.cbstatus;
+        }
+
+        if (config.setupIED != null) {
+            ConfigLoader.setupIED.iedName = config.setupIED.iedName;
+            ConfigLoader.setupIED.gocbRef = config.setupIED.gocbRef;
+            ConfigLoader.setupIED.datSet = config.setupIED.datSet;
+            ConfigLoader.setupIED.minTime = config.setupIED.minTime;
+            ConfigLoader.setupIED.maxTime = config.setupIED.maxTime;
+            ConfigLoader.setupIED.timestamp = config.setupIED.timestamp;
+            ConfigLoader.setupIED.stNum = config.setupIED.stNum;
+            ConfigLoader.setupIED.sqNum = config.setupIED.sqNum;
+        }
+
+        if (config.devices != null) {
+            ConfigLoader.devices.useCVariants = config.devices.useCVariants;
+        }
+    }
     
     public static SegmentData generateAttackSegment(
             Config.AttackSegmentConfig segmentConfig,
@@ -521,6 +586,24 @@ public class CreateAttackDatasetAction {
             return new ArrayList<>(messages.subList(0, count));
         }
         return messages;
+    }
+
+    private static void writeGooseMessagesCsv(ArrayList<Goose> gooseMessages, boolean printHeader) throws IOException {
+        Goose prev = null;
+        if (printHeader) {
+            CSVWritter.writeGooseOnlyHeader();
+        }
+        for (Goose gm : gooseMessages) {
+            if (prev != null) {
+                String gooseString = gm.asCSVFull();
+                String gooseConsistency = br.ufu.facom.ereno.featureEngineering.IntermessageCorrelation.getConsistencyFeaturesAsCSV(gm, prev);
+                double e2eLatency = gm.getE2ELatencyMs();
+                double receivedTimestamp = gm.getSubscriberRxTs() != null ? gm.getSubscriberRxTs() : gm.getTimestamp();
+                String line = gooseString + "," + gooseConsistency + "," + e2eLatency + "," + receivedTimestamp + "," + gm.getLabel();
+                CSVWritter.writeLine(line);
+            }
+            prev = gm.copy();
+        }
     }
     
     public static class SegmentData {
