@@ -1,0 +1,43 @@
+{
+  "action": "create_benign",
+  "description": "Generate benign (legitimate) traffic dataset",
+  "output": {
+    "directory": "target/benign_data",
+    "formats": ["arff", "csv"],
+    "filenamePrefix": null
+  },
+  "generation": {
+    "numberOfMessages": 60000,
+    "faultProbability": 5,
+    "svStrategy": "DECIMATED",
+    "svSamplesPerGoose": 80
+  },
+  "gooseFlow": {
+    "goID": "IntLockA",
+    "_comment_numberOfMessages": "LEGACY/IGNORED. kept because other ConfigLoader consumers may still touch the struct.",
+    "numberOfMessages": 1000000,
+    "ethSrc": "01:0c:cd:01:2f:80",
+    "ethDst": "01:0c:cd:01:2f:81",
+    "ethType": "0x88B8",
+    "gooseAppid": "0x00003001",
+    "TPID": "0x8100",
+    "ndsCom": false,
+    "test": false,
+    "cbstatus": false
+  },
+  "setupIED": {
+    "iedName": "Protection IED",
+    "gocbRef": "LD/LLN0$GO$gcblA",
+    "datSet": "LD/LLN0$IntLockA",
+    "minTime": "4",
+    "maxTime": "1000",
+    "timestamp": "1",
+    "stNum": "1",
+    "sqNum": "1"
+  },
+  "_comment_electricalSources": "REQUIRED. res10 / res50 / res100",
+  "electricalSources": {
+    "directory": "electrical-sources/res10",
+    "pattern": "SILVIO_*.out"
+  }
+}

@@ -1,0 +1,281 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package br.ufu.facom.ereno.messages;
+
+import br.ufu.facom.ereno.config.ConfigLoader;
+
+/**
+ * @author silvio
+ */
+public class Goose extends EthernetFrame {
+
+    private String label;
+    private Double publisherTxTs;
+    private Double subscriberRxTs;
+    /**
+     * Opaque CSV blob holding the 19 SV-derived columns (Time, isb/vsb A/B/C,
+     * the corresponding RmsValue and TrapAreaSum cycle features) that were
+     * correlated with this GOOSE when its host benign dataset was written.
+     * Carried alongside the GOOSE so attack actions can re-emit the exact
+     * SV row without needing the source .out files. Transient: only the
+     * value matters, not its identity.
+     */
+    private transient String svPrefixCsv;
+    private int cbStatus;                   // DYNAMICALLY GENERATED 
+    private int stNum;                      // DYNAMICALLY GENERATED 
+    private int sqNum;                      // DYNAMICALLY GENERATED 
+    private double t;                       // DYNAMICALLY GENERATED - Last Goose Change
+    private int gooseTimeAllowedtoLive = 11000;
+    private final int numDatSetEntries = 25;
+    private int confRev = 1;
+    public static String ethDst = "01:0c:cd:01:2f:77";
+    public static String ethSrc = "01:0c:cd:01:2f:78";
+    public static String ethType = "0x000088b8";
+    public static String gooseAppid = "0x00003001";
+    public static String TPID = "0x8100";
+    public static String gocbRef = "LD/LLN0$GO$gcbA";
+    public static String datSet = "LD/LLN0$IntLockA";
+    public static String goID = "IntLockA";
+    public static String test = "FALSE";
+    public static String ndsCom = "FALSE";
+    public static String protocol = "GOOSE";
+
+//    public static String label;
+
+    public Goose(int cbStatus, int stNum, int sqNum, double timestamp, double t, String label) {
+        fromECF();
+        this.cbStatus = cbStatus;
+        this.stNum = stNum;
+        this.sqNum = sqNum;
+        super.setTimestamp((timestamp));
+        this.t = (t);
+        this.label = label;
+        this.publisherTxTs = timestamp;
+        this.subscriberRxTs = null;
+    }
+
+    public Goose(int cbStatus, int stNum, int sqNum, double timestamp, double t, String label, Double publisherTxTs, Double subscriberRxTs) {
+        fromECF();
+        this.cbStatus = cbStatus;
+        this.stNum = stNum;
+        this.sqNum = sqNum;
+        super.setTimestamp((timestamp));
+        this.t = (t);
+        this.label = label;
+        this.publisherTxTs = publisherTxTs != null ? publisherTxTs : timestamp;
+        this.subscriberRxTs = subscriberRxTs;
+    }
+
+
+    private void fromECF() {
+
+        sqNum = Integer.parseInt(ConfigLoader.setupIED.sqNum);
+        stNum = Integer.parseInt(ConfigLoader.setupIED.stNum);
+        super.setTimestamp((Double.parseDouble(ConfigLoader.setupIED.timestamp)));
+        // Only overwrite the (static) protocol/IED-identification fields when
+        // the active config actually carries values. Downstream actions
+        // (CreateAttackDatasetAction, TrainModelAction, etc.) load the
+        // benign data without re-loading the upstream gooseFlow/setupIED
+        // ECF; a blind assignment would null these statics out and cause
+        // {@link #asCSVFull()} to emit the literal string "null", which
+        // Weka rejects as an undeclared nominal value.
+        if (ConfigLoader.setupIED.gocbRef != null) gocbRef = ConfigLoader.setupIED.gocbRef;
+        if (ConfigLoader.setupIED.datSet != null) datSet = ConfigLoader.setupIED.datSet;
+        if (ConfigLoader.gooseFlow.goID != null) goID = ConfigLoader.gooseFlow.goID;
+        if (ConfigLoader.gooseFlow.ethDst != null) ethDst = ConfigLoader.gooseFlow.ethDst;
+        if (ConfigLoader.gooseFlow.ethSrc != null) ethSrc = ConfigLoader.gooseFlow.ethSrc;
+        if (ConfigLoader.gooseFlow.ethType != null) ethType = ConfigLoader.gooseFlow.ethType;
+        if (ConfigLoader.gooseFlow.gooseAppid != null) gooseAppid = ConfigLoader.gooseFlow.gooseAppid;
+        if (ConfigLoader.gooseFlow.TPID != null) TPID = ConfigLoader.gooseFlow.TPID;
+
+        ndsCom = ConfigLoader.gooseFlow.ndsCom ? "TRUE" : "FALSE";
+        cbStatus = ConfigLoader.gooseFlow.cbstatus ? 1 : 0;
+        test = ConfigLoader.gooseFlow.test ? "TRUE" : "FALSE";
+    }
+
+    public int isCbStatus() {
+        return cbStatus;
+    }
+
+    public void setCbStatus(int cbStatus) {
+        this.cbStatus = cbStatus;
+    }
+
+    public int getStNum() {
+        return stNum;
+    }
+
+    public void setStNum(int stNum) {
+        this.stNum = stNum;
+    }
+
+    public int getSqNum() {
+        return sqNum;
+    }
+
+    public void setSqNum(int sqNum) {
+        this.sqNum = sqNum;
+    }
+
+    public int getCbStatus() {
+        return cbStatus;
+    }
+
+    public int getInverseCbStatus() {
+        if (cbStatus == 1) {
+            return 0;
+        } else {
+            return 1;
+        }
+    }
+
+
+    public int getFrameLen() {
+        return 200;/*String.valueOf(numDatSetEntries).length()
+                + String.valueOf(gooseTimeAllowedtoLive).length()
+                + String.valueOf(cbStatus).length()
+                + String.valueOf(stNum).length()
+                + String.valueOf(timestamp).length()
+                + String.valueOf(t).length()
+                + ethDst.length()
+                + ethSrc.length()
+                + ethType.length()
+                + gooseAppid.length()
+                + TPID.length()
+                + gocbRef.length()
+                + datSet.length()
+                + goID.length()
+                + test.length()
+                + ndsCom.length()
+                + 115;*/
+    }
+
+    public int getGooseLen() {
+        return getFrameLen() - 14;
+    }
+
+    public int getApduSize() {
+        return getGooseLen() - 11;
+    }
+
+    public String asCSVFull() {
+        return getT() + "," + getTimestamp() + "," + getSqNum() + "," + getStNum() + "," + cbStatus + ", " + getFrameLen()
+                + ", " + ethDst + ", " + ethSrc + ", " + ethType + ", " + gooseTimeAllowedtoLive + ", " + gooseAppid
+                + ", " + getGooseLen() + ", " + TPID + ", " + gocbRef + ", " + datSet
+                + ", " + goID + ", " + test + ", " + confRev + ", " + ndsCom
+                + ", " + numDatSetEntries + ", " + getGooseLen() + ", " + protocol;
+    }
+
+    public String asCSVCompact() {
+        return /*getT() + "," + */getTimestamp() + "," + getSqNum() + "," + getStNum() + "," + getCbStatus();
+    }
+
+    public String asCSVCompactHeader() {
+        return "timestamp , t, SqNum, StNum, cbStatus";
+    }
+
+
+    public String asDebug() {
+        System.out.println("TIMESTAMP:"+getTimestamp() +" T: "+getT());
+        return getTimestamp() + "," + getT() + "," + getSqNum() + "," + getStNum() + "," + cbStatus;
+    }
+
+    public String asCSVinverseStatus() {
+        if (cbStatus == 1) {
+            return getTimestamp() + "," + getSqNum() + "," + getStNum() + "," + 0;
+        } else {
+            return getTimestamp() + "," + getSqNum() + "," + getStNum() + "," + 1;
+        }
+    }
+
+    public String asCSVMasquerade(boolean resetSqNum) {
+        if (resetSqNum) {
+            setSqNum(0);
+        }
+        if (cbStatus == 1) {
+            return getTimestamp() + "," + getSqNum() + "," + getStNum() + "," + 0;
+        } else {
+            return getTimestamp() + "," + getSqNum() + "," + getStNum() + "," + 1;
+        }
+    }
+
+    public double getT() {
+        return t;
+    }
+
+    public void setT(double t) {
+        this.t = t;
+    }
+
+    public Goose copy() {
+        Goose c = new Goose(cbStatus, stNum, sqNum, getTimestamp(), t, label, publisherTxTs, subscriberRxTs);
+        c.svPrefixCsv = this.svPrefixCsv;
+        return c;
+    }
+
+    public String getSvPrefixCsv() {
+        return svPrefixCsv;
+    }
+
+    public void setSvPrefixCsv(String svPrefixCsv) {
+        this.svPrefixCsv = svPrefixCsv;
+    }
+
+    public Double getPublisherTxTs() {
+        return publisherTxTs;
+    }
+
+    public void setPublisherTxTs(Double publisherTxTs) {
+        this.publisherTxTs = publisherTxTs;
+    }
+
+    public Double getSubscriberRxTs() {
+        return subscriberRxTs;
+    }
+
+    public void setSubscriberRxTs(Double subscriberRxTs) {
+        this.subscriberRxTs = subscriberRxTs;
+    }
+
+    public double getE2ELatencyMs() {
+        if (publisherTxTs == null || subscriberRxTs == null) {
+            return 0.0;
+        }
+        double seconds = subscriberRxTs - publisherTxTs;
+        return Math.max(0.0, seconds * 1000.0);
+    }
+
+    @Deprecated
+    public double getE2EDelayMs() {
+        return getE2ELatencyMs();
+    }
+
+    public int getGooseTimeAllowedtoLive() {
+        return gooseTimeAllowedtoLive;
+    }
+
+    public void setGooseTimeAllowedtoLive(int gooseTimeAllowedtoLive) {
+        this.gooseTimeAllowedtoLive = gooseTimeAllowedtoLive;
+    }
+
+    public int getConfRev() {
+        return confRev;
+    }
+
+    public void setConfRev(int confRev) {
+        this.confRev = confRev;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+
+}
