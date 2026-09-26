@@ -71,6 +71,11 @@ public class CreateAttackDatasetAction {
         public OutputConfig output;
         public DatasetStructureConfig datasetStructure;
         public List<AttackSegmentConfig> attackSegments;
+        // Semente determinística da geração. Quando presente, execute() a aplica
+        // em ConfigLoader.RNG antes de gerar qualquer segmento, para que a mesma
+        // config produza os mesmos bytes (Fase 2.0 do journal). Ausente => o
+        // comportamento anterior (RNG semeada pelo relógio).
+        public Long randomSeed;
         
         public static class InputConfig {
             public String benignDataPath;
@@ -111,7 +116,15 @@ public class CreateAttackDatasetAction {
         
         // Load configuration
         Config config = loadConfig(configPath);
-        
+
+        // Semente determinística (Fase 2.0): aplicada antes de qualquer sorteio
+        // dos creators. Sem ela, a mesma config gera bytes diferentes a cada
+        // execução (medido no piloto E0) e a deriva vira ruído amostral.
+        if (config.randomSeed != null) {
+            ConfigLoader.setSeed(config.randomSeed);
+            LOGGER.info(() -> "Semente determinística aplicada: " + config.randomSeed);
+        }
+
         // Verify benign data exists
         if (config.input.verifyBenignData) {
             File benignFile = new File(config.input.benignDataPath);
