@@ -30,6 +30,7 @@ import br.ufu.facom.ereno.attacks.uc07.devices.HighRateStNumInjectorIED;
 import br.ufu.facom.ereno.attacks.uc07.devices.HighRateStNumInjectorIEDC;
 import br.ufu.facom.ereno.attacks.uc08.devices.GrayHoleVictimIED;
 import br.ufu.facom.ereno.attacks.uc08.devices.GrayHoleVictimIEDC;
+import br.ufu.facom.ereno.attacks.uc11.devices.ProgrammableIEDC;
 import br.ufu.facom.ereno.attacks.uc10.devices.BackoffDelayedReplayIEDC;
 import br.ufu.facom.ereno.attacks.uc10.devices.BatchDumpDelayedReplayIEDC;
 import br.ufu.facom.ereno.attacks.uc10.devices.DelayedReplayIED;
@@ -432,6 +433,8 @@ public class CreateAttackDatasetAction {
             return Labels.LABELS[8]; // "grayhole"
         } else if (segmentName.startsWith("uc10")) {
             return Labels.LABELS[9]; // "delayed_replay"
+        } else if (segmentName.startsWith("uc11")) {
+            return Labels.LABELS[10]; // "programmable"
         }
         return Labels.LABELS[0]; // default to "normal"
     }
@@ -577,7 +580,13 @@ public class CreateAttackDatasetAction {
                 return new BackoffDelayedReplayIEDC(benignIED, attackConfig);
             case "delayed_replay_double_drop":
                 return new DoubleDropDelayedReplayIEDC(benignIED, attackConfig);
-                
+
+            case "programmable":
+                // Ataque programável (uc11): comportamento vem de regras
+                // declarativas no config, não de uma classe por comportamento.
+                // Sem variante legacy — nasceu configurável.
+                return new ProgrammableIEDC(benignIED, attackConfig);
+
             default:
                 throw new IllegalArgumentException("Unknown attack type: " + attackType);
         }
