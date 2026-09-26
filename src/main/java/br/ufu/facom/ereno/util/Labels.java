@@ -17,6 +17,7 @@ public class Labels {
             "poisoned_high_rate",
             "grayhole",
             "delayed_replay",
+            "programmable",
     };
 
     /**
