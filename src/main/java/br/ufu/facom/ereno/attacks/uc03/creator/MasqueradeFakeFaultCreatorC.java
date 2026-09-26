@@ -1,6 +1,7 @@
 package br.ufu.facom.ereno.attacks.uc03.creator;
 
 import br.ufu.facom.ereno.config.AttackConfig;
+import br.ufu.facom.ereno.config.ConfigLoader;
 import br.ufu.facom.ereno.general.ProtectionIED;
 import br.ufu.facom.ereno.benign.uc00.creator.MessageCreator;
 import br.ufu.facom.ereno.dataExtractors.GSVDatasetWriter;
@@ -58,7 +59,7 @@ public class MasqueradeFakeFaultCreatorC implements MessageCreator {
             Goose g = legitimateMessages.get(idx).copy();
             g.setLabel(GSVDatasetWriter.label[3]); // masquerade fake fault
 
-            if (Math.random() >= faultProbability) {
+            if (ConfigLoader.RNG.nextDouble() >= faultProbability) {
                 skipped++;
                 continue;
             }
@@ -136,8 +137,8 @@ public class MasqueradeFakeFaultCreatorC implements MessageCreator {
             for (int i = ANALOG_FIRST; i <= ANALOG_LAST; i++) {
                 Double v = parseDoubleOrNull(cells[i]);
                 if (v == null) continue;
-                double delta = analogMin + (analogMax - analogMin) * Math.random();
-                if (Math.random() < 0.5) delta = -delta;
+                double delta = analogMin + (analogMax - analogMin) * ConfigLoader.RNG.nextDouble();
+                if (ConfigLoader.RNG.nextDouble() < 0.5) delta = -delta;
                 cells[i] = Double.toString(v + delta);
             }
         }
@@ -146,12 +147,12 @@ public class MasqueradeFakeFaultCreatorC implements MessageCreator {
             for (int i = TRAP_FIRST; i <= TRAP_LAST; i++) {
                 Double v = parseDoubleOrNull(cells[i]);
                 if (v == null) continue;
-                double mult = trapMin + (trapMax - trapMin) * Math.random();
+                double mult = trapMin + (trapMax - trapMin) * ConfigLoader.RNG.nextDouble();
                 double mutated = v * mult;
-                if (Math.random() < spikeProb) {
+                if (ConfigLoader.RNG.nextDouble() < spikeProb) {
                     // Sign-flip the spike half the time so trap sums can
                     // swing either way around the periodic baseline.
-                    mutated += (Math.random() < 0.5 ? 1.0 : -1.0) * Math.abs(v) * trapMax;
+                    mutated += (ConfigLoader.RNG.nextDouble() < 0.5 ? 1.0 : -1.0) * Math.abs(v) * trapMax;
                 }
                 cells[i] = Double.toString(mutated);
             }

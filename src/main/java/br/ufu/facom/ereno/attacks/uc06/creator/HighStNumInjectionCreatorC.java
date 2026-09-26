@@ -1,6 +1,7 @@
 package br.ufu.facom.ereno.attacks.uc06.creator;
 
 import br.ufu.facom.ereno.config.AttackConfig;
+import br.ufu.facom.ereno.config.ConfigLoader;
 import br.ufu.facom.ereno.general.ProtectionIED;
 import br.ufu.facom.ereno.benign.uc00.creator.MessageCreator;
 import br.ufu.facom.ereno.dataExtractors.GSVDatasetWriter;
@@ -53,14 +54,14 @@ public class HighStNumInjectionCreatorC implements MessageCreator {
 
             // 2) sqNum: either reset to 0 (with prob) or add a configured
             //    delta (legacy uc06 used [0,5]).
-            if (sqnumResetProb > 0.0 && Math.random() < sqnumResetProb) {
+            if (sqnumResetProb > 0.0 && ConfigLoader.RNG.nextDouble() < sqnumResetProb) {
                 g.setSqNum(0);
             } else if (sqDeltaMax > 0) {
                 g.setSqNum(g.getSqNum() + randomBetween(sqDeltaMin, sqDeltaMax));
             }
 
             // 3) Optional TTL override
-            if (ttlValuesMs.length > 0 && ttlProb > 0.0 && Math.random() < ttlProb) {
+            if (ttlValuesMs.length > 0 && ttlProb > 0.0 && ConfigLoader.RNG.nextDouble() < ttlProb) {
                 int pick = ttlValuesMs[randomBetween(0, ttlValuesMs.length - 1)];
                 g.setGooseTimeAllowedtoLive(pick);
             }

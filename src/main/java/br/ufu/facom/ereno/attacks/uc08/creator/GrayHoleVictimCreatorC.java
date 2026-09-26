@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import br.ufu.facom.ereno.benign.uc00.creator.MessageCreator;
 import br.ufu.facom.ereno.config.AttackConfig;
+import br.ufu.facom.ereno.config.ConfigLoader;
 import br.ufu.facom.ereno.dataExtractors.GSVDatasetWriter;
 import br.ufu.facom.ereno.general.IED;
 import br.ufu.facom.ereno.general.ProtectionIED;
@@ -31,7 +32,7 @@ public class GrayHoleVictimCreatorC implements MessageCreator {
         double statusChangeDropProb = config.getDouble("statusChangeDropProb", 0.25);
         
         // Calculate base drop rate
-        double baseDropRate = dropRateMin + (Math.random() * (dropRateMax - dropRateMin));
+        double baseDropRate = dropRateMin + (ConfigLoader.RNG.nextDouble() * (dropRateMax - dropRateMin));
         
         int messagesAdded = 0;
         int messagesDropped = 0;
@@ -50,9 +51,9 @@ public class GrayHoleVictimCreatorC implements MessageCreator {
             }
             
             // Start a burst drop?
-            if (!inBurstDrop && Math.random() < burstDropProb) {
+            if (!inBurstDrop && ConfigLoader.RNG.nextDouble() < burstDropProb) {
                 inBurstDrop = true;
-                burstDropRemaining = (int)(burstDropMin + Math.random() * (burstDropMax - burstDropMin + 1));
+                burstDropRemaining = (int)(burstDropMin + ConfigLoader.RNG.nextDouble() * (burstDropMax - burstDropMin + 1));
             }
             
             // Decide whether to drop
@@ -60,7 +61,7 @@ public class GrayHoleVictimCreatorC implements MessageCreator {
             
             if (inBurstDrop && burstDropRemaining > 0) {
                 // In burst drop mode - higher drop chance
-                shouldDrop = !isStatusChange || Math.random() < statusChangeDropProb;
+                shouldDrop = !isStatusChange || ConfigLoader.RNG.nextDouble() < statusChangeDropProb;
                 burstDropRemaining--;
                 if (burstDropRemaining == 0) {
                     inBurstDrop = false;
@@ -68,7 +69,7 @@ public class GrayHoleVictimCreatorC implements MessageCreator {
             } else {
                 // Normal drop decision
                 double dropChance = isStatusChange ? statusChangeDropProb : baseDropRate;
-                shouldDrop = Math.random() < dropChance;
+                shouldDrop = ConfigLoader.RNG.nextDouble() < dropChance;
             }
             
             if (shouldDrop) {

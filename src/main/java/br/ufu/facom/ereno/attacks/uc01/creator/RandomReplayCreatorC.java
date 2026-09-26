@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 
 import br.ufu.facom.ereno.benign.uc00.creator.MessageCreator;
 import br.ufu.facom.ereno.config.AttackConfig;
+import br.ufu.facom.ereno.config.ConfigLoader;
 import br.ufu.facom.ereno.dataExtractors.GSVDatasetWriter;
 import br.ufu.facom.ereno.general.IED;
 import static br.ufu.facom.ereno.general.IED.randomBetween;
@@ -104,9 +105,9 @@ public class RandomReplayCreatorC implements MessageCreator {
                                    Math.min((float)(delayMaxMs/1000.0), calculatedDelay));
 
             // Optional reorder: place this replay BEFORE the previous one to produce a negative timestampDiff. Otherwise advance forward.
-            boolean doReorder = reorderProb > 0.0 && Math.random() < reorderProb;
+            boolean doReorder = reorderProb > 0.0 && ConfigLoader.RNG.nextDouble() < reorderProb;
             if (doReorder) {
-                double backStep = (delayMinMs + Math.random() * Math.max(1.0, delayMaxMs - delayMinMs)) / 1000.0;
+                double backStep = (delayMinMs + ConfigLoader.RNG.nextDouble() * Math.max(1.0, delayMaxMs - delayMinMs)) / 1000.0;
                 randomGoose.setTimestamp(previousMessage.getTimestamp() - backStep);
                 reorders++;
             } else {
@@ -127,7 +128,7 @@ public class RandomReplayCreatorC implements MessageCreator {
             previousMessage = randomGoose;
 
             // Optional burst suffix
-            if (burstEnabled && burstProb > 0.0 && Math.random() < burstProb && burstMax > 0) {
+            if (burstEnabled && burstProb > 0.0 && ConfigLoader.RNG.nextDouble() < burstProb && burstMax > 0) {
                 int burstLen = randomBetween(Math.max(1, burstMin), Math.max(1, burstMax));
                 bursts++;
                 double cursor = previousMessage.getTimestamp();
@@ -135,7 +136,7 @@ public class RandomReplayCreatorC implements MessageCreator {
                     Goose burstMsg = previousMessage.copy();
                     burstMsg.setLabel(GSVDatasetWriter.label[1]);
                     double gapMs = (burstGapMaxMs > 0)
-                            ? burstGapMinMs + Math.random() * (burstGapMaxMs - burstGapMinMs)
+                            ? burstGapMinMs + ConfigLoader.RNG.nextDouble() * (burstGapMaxMs - burstGapMinMs)
                             : 0.0;
                     cursor += gapMs / 1000.0;
                     burstMsg.setTimestamp(cursor);
@@ -163,7 +164,7 @@ public class RandomReplayCreatorC implements MessageCreator {
 
     private static void maybeApplyTtl(Goose g, int[] values, double prob) {
         if (values.length == 0 || prob <= 0.0) return;
-        if (Math.random() < prob) {
+        if (ConfigLoader.RNG.nextDouble() < prob) {
             int pick = values[randomBetween(0, values.length - 1)];
             g.setGooseTimeAllowedtoLive(pick);
         }

@@ -18,7 +18,7 @@ public class InjectionCreatorC implements MessageCreator {
 
     private final ArrayList<Goose> legitimateMessages;
     private final AttackConfig config;
-    private final Random rng; // null => fall back to Math.random()/IED.randomBetween
+    private final Random rng; // null => fall back to IED.randomBetween (que usa ConfigLoader.RNG)
 
     public InjectionCreatorC(ArrayList<Goose> legitimateMessages, AttackConfig config) {
         this.legitimateMessages = legitimateMessages;

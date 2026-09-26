@@ -1,6 +1,7 @@
 package br.ufu.facom.ereno.attacks.uc02.creator;
 
 import br.ufu.facom.ereno.config.AttackConfig;
+import br.ufu.facom.ereno.config.ConfigLoader;
 import br.ufu.facom.ereno.general.ProtectionIED;
 import br.ufu.facom.ereno.dataExtractors.GSVDatasetWriter;
 import br.ufu.facom.ereno.benign.uc00.creator.MessageCreator;
@@ -96,13 +97,13 @@ public class InverseReplayCreatorC implements MessageCreator {
                 }
 
                 // Optional burst suffix.
-                if (burstEnabled && burstProb > 0.0 && Math.random() < burstProb && burstMax > 0) {
+                if (burstEnabled && burstProb > 0.0 && ConfigLoader.RNG.nextDouble() < burstProb && burstMax > 0) {
                     int burstLen = randomBetween(Math.max(1, burstMin), Math.max(1, burstMax));
                     double cursor = anchor + (randomBetween((int) minMs, (int) maxMs) / 1000.0);
                     for (int b = 0; b < burstLen; b++) {
                         Goose burstMsg = seed.copy();
                         double gapMs = (burstGapMaxMs > 0)
-                                ? burstGapMinMs + Math.random() * (burstGapMaxMs - burstGapMinMs)
+                                ? burstGapMinMs + ConfigLoader.RNG.nextDouble() * (burstGapMaxMs - burstGapMinMs)
                                 : 0.0;
                         cursor += gapMs / 1000.0;
                         burstMsg.setTimestamp(cursor);
@@ -128,7 +129,7 @@ public class InverseReplayCreatorC implements MessageCreator {
 
     private static void maybeApplyTtl(Goose g, int[] values, double prob) {
         if (values.length == 0 || prob <= 0.0) return;
-        if (Math.random() < prob) {
+        if (ConfigLoader.RNG.nextDouble() < prob) {
             int pick = values[randomBetween(0, values.length - 1)];
             g.setGooseTimeAllowedtoLive(pick);
         }
