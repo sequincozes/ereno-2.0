@@ -34,6 +34,9 @@ public class CreateBenignAction {
         public GooseFlowConfig gooseFlow;
         public SetupIEDConfig setupIED;
         public BenignDataManager.ElectricalSourcesConfig electricalSources;
+        // Deterministic seed for the benign generation, as in
+        // CreateAttackDatasetAction. Absent => the RNG stays clock-seeded.
+        public Long randomSeed;
 
         public static class OutputConfig {
             public String directory = "target/benign_data";
@@ -84,6 +87,14 @@ public class CreateBenignAction {
 
         // Populate ConfigLoader for compatibility with existing code
         populateConfigLoader(config);
+
+        // Seed after populating, before any device draws a number. Without it
+        // every benign trace is different and none is reproducible, so a split
+        // by seed cannot give each run its own normal traffic.
+        if (config.randomSeed != null) {
+            ConfigLoader.setSeed(config.randomSeed);
+            LOGGER.info(() -> "Deterministic seed applied: " + config.randomSeed);
+        }
 
         // Create output directory
         File outDir = new File(config.output.directory);
