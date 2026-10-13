@@ -30,8 +30,8 @@ public class RandomReplayCreatorC implements MessageCreator {
         // Burst / reorder / TTL knobs (resolved once)
         boolean burstEnabled = config.hasObject("burst");
         double burstProb = config.getNestedProb("burst", "prob", 0.0);
-        int burstMin = config.getNestedRangeMinInt("burst", "min", 0);
-        int burstMax = config.getNestedRangeMaxInt("burst", "max", 0);
+        int burstMin = config.getNestedInt("burst", "min", 0);
+        int burstMax = config.getNestedInt("burst", "max", 0);
         double burstGapMinMs = config.getNestedRangeMin("burst", "gapMs", 0.0);
         double burstGapMaxMs = Math.max(burstGapMinMs,
                 config.getNestedRangeMax("burst", "gapMs", burstGapMinMs));

@@ -49,13 +49,13 @@ public class InverseReplayCreatorC implements MessageCreator {
         double minMs = config.getDelayMinMs(300);
         double maxMs = config.getDelayMaxMs(5000);
 
-        int blockMin = Math.max(1, config.getNestedRangeMinInt("blockLen", "min", 1));
-        int blockMax = Math.max(blockMin, config.getNestedRangeMaxInt("blockLen", "max", 1));
+        int blockMin = Math.max(1, config.getRangeMinInt("blockLen", 1));
+        int blockMax = Math.max(blockMin, config.getRangeMaxInt("blockLen", 1));
 
         boolean burstEnabled = config.hasObject("burst");
         double burstProb = config.getNestedProb("burst", "prob", 0.0);
-        int burstMin = config.getNestedRangeMinInt("burst", "min", 0);
-        int burstMax = config.getNestedRangeMaxInt("burst", "max", 0);
+        int burstMin = config.getNestedInt("burst", "min", 0);
+        int burstMax = config.getNestedInt("burst", "max", 0);
         double burstGapMinMs = config.getNestedRangeMin("burst", "gapMs", 0.0);
         double burstGapMaxMs = Math.max(burstGapMinMs,
                 config.getNestedRangeMax("burst", "gapMs", burstGapMinMs));

@@ -26,8 +26,8 @@ public class GrayHoleVictimCreatorC implements MessageCreator {
         double dropRateMin = config.getRangeMin("dropRate", 0.25);
         double dropRateMax = config.getRangeMax("dropRate", 0.35);
         double burstDropProb = config.getDouble("burstDropProb", 0.20);
-        int burstDropMin = config.getNestedRangeMinInt("burstDropLen", "min", 3);
-        int burstDropMax = config.getNestedRangeMaxInt("burstDropLen", "max", 7);
+        int burstDropMin = config.getRangeMinInt("burstDropLen", 3);
+        int burstDropMax = config.getRangeMaxInt("burstDropLen", 7);
         boolean protectStatusChanges = config.getBoolean("protectStatusChanges", false);
         double statusChangeDropProb = config.getDouble("statusChangeDropProb", 0.25);
         
