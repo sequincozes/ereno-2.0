@@ -34,8 +34,10 @@ public abstract class IED {
     }
 
     public static int randomBetween(int lowerLimit, int upperLimit) {
-        if (lowerLimit >= upperLimit) {
-            throw new IllegalArgumentException("The lower limit (" + lowerLimit + ") must be less than the upper limit (" + upperLimit + ").");
+        // Inclusive on both ends, so lower == upper is a valid one-value range
+        // (a one-entry list, a replay window that holds a single message).
+        if (lowerLimit > upperLimit) {
+            throw new IllegalArgumentException("The lower limit (" + lowerLimit + ") must not exceed the upper limit (" + upperLimit + ").");
         }
 
         // Use the shared RNG from ConfigLoader so runs can be made deterministic by setting randomSeed

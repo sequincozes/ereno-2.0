@@ -73,14 +73,23 @@ public class AttackConfig {
     }
 
     public double getDelayMinMs(double defaultMs) {
-        double val = getRangeMin("delayMs", defaultMs);
-
-        return val < 10 ? val * 1000 : val;
+        return getRangeMin("delayMs", defaultMs) * delayScaleToMs();
     }
 
     public double getDelayMaxMs(double defaultMs) {
-        double val = getRangeMax("delayMs", defaultMs);
-        return val < 10 ? val * 1000 : val;
+        return getRangeMax("delayMs", defaultMs) * delayScaleToMs();
+    }
+
+    /**
+     * delayMs values below 10 are read as seconds (legacy configs). The unit is
+     * decided once for the pair, from its upper bound: deciding it per bound
+     * turned {min: 8, max: 80} into 8000..80 ms and aborted the run.
+     */
+    private double delayScaleToMs() {
+        if (!hasObject("delayMs") || !getObject("delayMs").has("max")) {
+            return 1.0;
+        }
+        return getRangeMax("delayMs", 10) < 10 ? 1000.0 : 1.0;
     }
 
     public double getWindowMinS(double defaultSeconds) {
