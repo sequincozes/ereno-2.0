@@ -7,10 +7,10 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest run"
   },
   "dependencies": {
-    "@floating-ui/react": "^0.27.16",
     "@tailwindcss/vite": "^4.1.12",
     "firebase": "^12.3.0",
     "lucide-react": "^0.542.0",
@@ -22,7 +22,6 @@
   "devDependencies": {
     "@eslint/js": "^9.33.0",
     "@skeletonlabs/skeleton": "^3.2.0",
-    "@skeletonlabs/skeleton-react": "^1.4.0",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
     "@vitejs/plugin-react": "^5.0.0",
@@ -32,6 +31,7 @@
     "globals": "^16.3.0",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.39.1",
-    "vite": "^7.1.2"
+    "vite": "^7.1.2",
+    "vitest": "^3.2.4"
   }
 }

@@ -4,7 +4,6 @@
 @import '@skeletonlabs/skeleton/optional/presets';
 @import '@skeletonlabs/skeleton/themes/cerberus';
 
-@source '../node_modules/@skeletonlabs/skeleton-react/dist';
 
 body {
   background-color: #ECF0FF;

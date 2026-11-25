@@ -1,5 +1,5 @@
 import React, { createContext, useEffect, useState } from 'react';
-import { auth, db } from '../config/firebase';
+import { auth, db, firebaseEnabled } from '../config/firebase';
 import { onAuthStateChanged, signOut as firebaseSignOut } from 'firebase/auth';
 import type { User as FirebaseUser } from 'firebase/auth';
 import { ref, onValue, set } from 'firebase/database';
@@ -17,14 +17,19 @@ type AppUser = AppUserBase | null;
 type AuthContextValue = {
   user: AppUser;
   loading: boolean;
+  /** False when Firebase is off: the app runs locally without login. */
+  authEnabled: boolean;
   updateProfile: (data: Partial<Omit<AppUserBase, 'uid'>>) => Promise<void>;
   signOut: () => Promise<void>;
 };
+
+const LOCAL_USER: AppUserBase = { uid: 'local', name: 'Local user' };
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<AppUser>(() => {
+    if (!firebaseEnabled) return LOCAL_USER;
     try {
       const raw = localStorage.getItem('app_user');
       return raw ? JSON.parse(raw) : null;
@@ -32,18 +37,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return null;
     }
   });
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(firebaseEnabled);
 
   useEffect(() => {
+    if (!firebaseEnabled || !auth || !db) return;
+    const database = db;
     const unsub = onAuthStateChanged(auth, (firebaseUser: FirebaseUser | null) => {
       if (!firebaseUser) {
         setUser(null);
-        localStorage.removeItem('app_user');
+        try { localStorage.removeItem('app_user'); } catch { /* storage unavailable */ }
         setLoading(false);
         return;
       }
 
-      const userRef = ref(db, `users/${firebaseUser.uid}`);
+      const userRef = ref(database, `users/${firebaseUser.uid}`);
       onValue(userRef, (snapshot) => {
         const data = snapshot.val();
         const appUser: AppUser = {
@@ -54,17 +61,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           course: data?.course || null,
         };
         setUser(appUser);
-        localStorage.setItem('app_user', JSON.stringify(appUser));
+        try { localStorage.setItem('app_user', JSON.stringify(appUser)); } catch { /* storage unavailable */ }
         setLoading(false);
       }, () => {
-        const appUser: AppUser = {
+        setUser({
           uid: firebaseUser.uid,
           name: firebaseUser.displayName || '',
           email: firebaseUser.email,
           avatarUrl: firebaseUser.photoURL || null,
           course: null,
-        };
-        setUser(appUser);
+        });
         setLoading(false);
       });
     });
@@ -74,32 +80,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const updateProfile = async (data: Partial<Omit<AppUserBase, 'uid'>>) => {
     if (!user) throw new Error('Not authenticated');
-    const userRef = ref(db, `users/${user.uid}`);
-    const newData = {
+    if (!db) return;
+    const stored = {
       name: data.name ?? user.name,
       avatarUrl: data.avatarUrl ?? user.avatarUrl ?? null,
       course: data.course ?? user.course ?? null,
       email: data.email ?? user.email ?? null,
-    } as Partial<AppUserBase>;
-    await set(userRef, newData);
-    const updated: AppUser = {
-      uid: user.uid,
-      name: (newData as AppUserBase).name,
-      email: (newData as AppUserBase).email,
-      avatarUrl: (newData as AppUserBase).avatarUrl,
-      course: (newData as AppUserBase).course,
-    } as AppUser;
-    setUser(updated);
+    };
+    await set(ref(db, `users/${user.uid}`), stored);
+    setUser({ uid: user.uid, ...stored });
   };
 
   const signOut = async () => {
+    if (!auth) return;
     await firebaseSignOut(auth);
     setUser(null);
-    localStorage.removeItem('app_user');
+    try { localStorage.removeItem('app_user'); } catch { /* storage unavailable */ }
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, updateProfile, signOut }}>
+    <AuthContext.Provider value={{ user, loading, authEnabled: firebaseEnabled, updateProfile, signOut }}>
       {children}
     </AuthContext.Provider>
   );
