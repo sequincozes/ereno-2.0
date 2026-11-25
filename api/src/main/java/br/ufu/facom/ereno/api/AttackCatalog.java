@@ -30,6 +30,8 @@ public final class AttackCatalog {
         m.put("high_rate_stnum_injection", "uc07");
         m.put("grayhole", "uc08");
         m.put("greyhole", "uc08");
+        m.put("oriented_grayhole", "uc09");
+        m.put("oriented_greyhole", "uc09");
         m.put("delayed_replay", "uc10");
         m.put("delayed_replay_batch_dump", "uc10");
         m.put("delayed_replay_backoff", "uc10");

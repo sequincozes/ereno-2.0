@@ -73,15 +73,31 @@ export function newAttack(template: CatalogAttack): DraftAttack {
 }
 
 /** Template keys that document a file rather than configure the attack. */
-const NON_PARAMETER_KEYS = new Set(['description', 'comment', '_comment', 'enabled']);
+const NON_PARAMETER_KEYS = new Set(['description', 'comment', 'enabled']);
+
+/** Keys starting with "_" are template metadata (comments, `_options`), never parameters. */
+export function isMetaKey(key: string): boolean {
+  return key.startsWith('_');
+}
 
 function stripDocs(config: JsonObject): JsonObject {
   const out: JsonObject = {};
   for (const [k, v] of Object.entries(config)) {
-    if (NON_PARAMETER_KEYS.has(k) || k.startsWith('_comment')) continue;
+    if (NON_PARAMETER_KEYS.has(k) || isMetaKey(k)) continue;
     out[k] = v;
   }
   return out;
+}
+
+/**
+ * Allowed values for a string parameter, declared by a template as
+ * `"_options": {"approach": ["A", "B"]}`. Returns undefined for free text.
+ */
+export function optionsFor(template: JsonObject | undefined, key: string): string[] | undefined {
+  const opts = template?._options;
+  if (!opts || typeof opts !== 'object' || Array.isArray(opts)) return undefined;
+  const list = (opts as JsonObject)[key];
+  return Array.isArray(list) && list.every(v => typeof v === 'string') ? (list as string[]) : undefined;
 }
 
 export function buildRunSpec(draft: RunDraft): RunSpec {

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
-  buildRunSpec, draftFromCatalog, draftFromSpec, errorsFor, humanize, isRange, newAttack, stepForField,
+  buildRunSpec, draftFromCatalog, draftFromSpec, errorsFor, humanize, isMetaKey, isRange, newAttack, optionsFor,
+  stepForField,
 } from './runDraft';
 import type { Catalog } from '../types/run';
 
@@ -113,5 +114,30 @@ describe('labels', () => {
     expect(isRange({ min: 1, max: 2 })).toBe(true);
     expect(isRange({ min: 1, max: 2, gapMs: { min: 1, max: 2 } })).toBe(false);
     expect(isRange([1, 2])).toBe(false);
+  });
+});
+
+describe('template metadata', () => {
+  const uc09 = {
+    attackType: 'oriented_grayhole', approach: 'RANDOMIC_MESSAGE', discardProb: 0.15,
+    burstLen: { min: 5, max: 5 },
+    _options: { approach: ['RANDOMIC_MESSAGE', 'RANDOMIC_BURST', 'DETERMINISTIC_BURST'] },
+    _comment_x: 'note',
+  };
+
+  it('reads select options declared in _options', () => {
+    expect(optionsFor(uc09, 'approach')).toEqual(['RANDOMIC_MESSAGE', 'RANDOMIC_BURST', 'DETERMINISTIC_BURST']);
+    expect(optionsFor(uc09, 'discardProb')).toBeUndefined();
+    expect(optionsFor(undefined, 'approach')).toBeUndefined();
+  });
+
+  it('never sends metadata keys to the backend', () => {
+    const d = draftFromCatalog(catalog);
+    d.attacks = [{ key: 'k', templateId: 'uc09_oriented_grayhole', config: uc09 }];
+    expect(buildRunSpec(d).attacks[0].config).toEqual({
+      attackType: 'oriented_grayhole', approach: 'RANDOMIC_MESSAGE', discardProb: 0.15, burstLen: { min: 5, max: 5 },
+    });
+    expect(isMetaKey('_options')).toBe(true);
+    expect(isMetaKey('approach')).toBe(false);
   });
 });

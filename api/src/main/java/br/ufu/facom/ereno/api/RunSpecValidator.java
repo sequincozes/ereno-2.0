@@ -14,6 +14,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
+import br.ufu.facom.ereno.attacks.uc09.creator.OrientedGrayHoleCreatorC;
+
 /**
  * Checks a RunSpec before it is queued, so a bad field is reported to the
  * client by name instead of failing minutes later inside a child process.
@@ -166,6 +168,9 @@ public final class RunSpecValidator {
             if ("programmable".equalsIgnoreCase(type)) {
                 validateProgrammable(cfg, base + ".config", errors);
             }
+            if ("oriented_grayhole".equalsIgnoreCase(type) || "oriented_greyhole".equalsIgnoreCase(type)) {
+                validateOrientedGrayhole(cfg, base + ".config", errors);
+            }
         }
     }
 
@@ -183,6 +188,30 @@ public final class RunSpecValidator {
                 checkRanges(v.getAsJsonObject(), childPath, errors);
             } else if (isNumber(v) && e.getKey().toLowerCase().endsWith("prob") && v.getAsDouble() < 0) {
                 errors.add(new FieldError(childPath, "Must be >= 0"));
+            }
+        }
+    }
+
+    private static void validateOrientedGrayhole(JsonObject cfg, String path, List<FieldError> errors) {
+        String approach = stringOrNull(cfg, "approach");
+        if (approach != null) {
+            try {
+                OrientedGrayHoleCreatorC.parseApproach(approach);
+            } catch (IllegalArgumentException e) {
+                errors.add(new FieldError(path + ".approach",
+                        "Must be RANDOMIC_MESSAGE, RANDOMIC_BURST or DETERMINISTIC_BURST"));
+            }
+        }
+        if (cfg.has("discardProb") && isNumber(cfg.get("discardProb"))) {
+            double p = cfg.get("discardProb").getAsDouble();
+            if (p < 0 || p > 100) {
+                errors.add(new FieldError(path + ".discardProb", "Must be in [0, 1] (or a percentage up to 100)"));
+            }
+        }
+        if (cfg.has("burstLen") && cfg.get("burstLen").isJsonObject()) {
+            JsonObject b = cfg.getAsJsonObject("burstLen");
+            if (b.has("min") && isNumber(b.get("min")) && b.get("min").getAsDouble() < 1) {
+                errors.add(new FieldError(path + ".burstLen.min", "Must be >= 1"));
             }
         }
     }

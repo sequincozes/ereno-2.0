@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Trash2 as IconTrash, Copy as IconCopy } from 'lucide-react';
-import { CheckboxField, NumberField, TextField } from '../../components/common/Fields';
-import { humanize, isRange } from '../../run/runDraft';
+import { CheckboxField, NumberField, SelectField, TextField } from '../../components/common/Fields';
+import { humanize, isMetaKey, isRange, optionsFor } from '../../run/runDraft';
 import type { CatalogAttack, DraftAttack, FieldError, JsonObject, JsonValue } from '../../types/run';
 
 // Renders any attack template generically: numbers, booleans, strings, number
@@ -36,7 +36,7 @@ export default function AttackEditor({ index, attack, template, errors, onChange
 
   const renderEntries = (obj: JsonObject, path: string[]) =>
     Object.entries(obj)
-      .filter(([k]) => !(path.length === 0 && HIDDEN.has(k)) && !k.startsWith('_comment'))
+      .filter(([k]) => !(path.length === 0 && HIDDEN.has(k)) && !isMetaKey(k))
       .map(([k, v]) => renderValue(k, v, [...path, k]));
 
   const renderValue = (key: string, value: JsonValue, path: string[]) => {
@@ -52,6 +52,14 @@ export default function AttackEditor({ index, attack, template, errors, onChange
         <div key={id} className="flex items-end pb-1">
           <CheckboxField label={humanize(key)} checked={value} onChange={v => update(path, v)} />
         </div>
+      );
+    }
+    const options = path.length === 1 ? optionsFor(template?.template ?? attack.config, key) : undefined;
+    if (typeof value === 'string' && options) {
+      const list = options.includes(value) ? options : [value, ...options];
+      return (
+        <SelectField<string> key={id} label={humanize(key)} value={value} error={err(path)}
+          options={list.map(o => ({ value: o, label: o }))} onChange={v => update(path, v)} />
       );
     }
     if (typeof value === 'string') {

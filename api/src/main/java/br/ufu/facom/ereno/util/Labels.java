@@ -18,6 +18,9 @@ public class Labels {
             "grayhole",
             "delayed_replay",
             "programmable",
+            // Appended (not inserted at uc09's position) so the indexes of
+            // existing labels, and the creators that use them, stay put.
+            "oriented_grayhole",
     };
 
     /**

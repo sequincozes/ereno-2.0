@@ -1,0 +1,13 @@
+{
+  "attackType": "oriented_grayhole",
+  "description": "Oriented grayhole (UC09): drops the messages that follow a status change (stNum increment)",
+  "approach": "RANDOMIC_MESSAGE",
+  "discardProb": 0.15,
+  "burstLen": {
+    "min": 5,
+    "max": 5
+  },
+  "_options": {
+    "approach": ["RANDOMIC_MESSAGE", "RANDOMIC_BURST", "DETERMINISTIC_BURST"]
+  }
+}

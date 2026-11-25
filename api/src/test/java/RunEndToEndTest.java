@@ -38,6 +38,7 @@ public class RunEndToEndTest {
             JsonObject specJson = RunsApiTest.validSpec("e2e");
             specJson.getAsJsonArray("attacks").add(RunsApiTest.attack(RunsApiTest.readTemplate("uc08_grayhole")));
             specJson.getAsJsonArray("attacks").add(RunsApiTest.attack(RunsApiTest.readTemplate("uc11_programmable")));
+            specJson.getAsJsonArray("attacks").add(RunsApiTest.attack(RunsApiTest.readTemplate("uc09_oriented_grayhole")));
             RunSpec spec = new Gson().fromJson(specJson, RunSpec.class);
             assertTrue(new RunSpecValidator(RunsApiTest.ELECTRICAL).validate(spec).isEmpty());
 
@@ -47,6 +48,7 @@ public class RunEndToEndTest {
             assertTrue(labels.getOrDefault("random_replay", 0) > 0, labels.toString());
             assertTrue(labels.getOrDefault("grayhole", 0) > 0, labels.toString());
             assertTrue(labels.getOrDefault("programmable", 0) > 0, labels.toString());
+            assertTrue(labels.getOrDefault("oriented_grayhole", 0) > 0, labels.toString());
 
             String second = runAndRead(runs, spec);
             assertEquals(first, second, "same spec and seed must give the same dataset");

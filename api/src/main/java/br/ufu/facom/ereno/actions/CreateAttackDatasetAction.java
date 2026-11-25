@@ -30,6 +30,7 @@ import br.ufu.facom.ereno.attacks.uc07.devices.HighRateStNumInjectorIED;
 import br.ufu.facom.ereno.attacks.uc07.devices.HighRateStNumInjectorIEDC;
 import br.ufu.facom.ereno.attacks.uc08.devices.GrayHoleVictimIED;
 import br.ufu.facom.ereno.attacks.uc08.devices.GrayHoleVictimIEDC;
+import br.ufu.facom.ereno.attacks.uc09.devices.OrientedGrayHoleIEDC;
 import br.ufu.facom.ereno.attacks.uc11.devices.ProgrammableIEDC;
 import br.ufu.facom.ereno.attacks.uc10.devices.BackoffDelayedReplayIEDC;
 import br.ufu.facom.ereno.attacks.uc10.devices.BatchDumpDelayedReplayIEDC;
@@ -431,6 +432,8 @@ public class CreateAttackDatasetAction {
             return Labels.LABELS[7]; // "poisoned_high_rate"
         } else if (segmentName.startsWith("uc08")) {
             return Labels.LABELS[8]; // "grayhole"
+        } else if (segmentName.startsWith("uc09")) {
+            return Labels.LABELS[11]; // "oriented_grayhole"
         } else if (segmentName.startsWith("uc10")) {
             return Labels.LABELS[9]; // "delayed_replay"
         } else if (segmentName.startsWith("uc11")) {
@@ -572,6 +575,11 @@ public class CreateAttackDatasetAction {
                     // C variant uses config parameters from attack config file
                     return new GrayHoleVictimIEDC(benignIED, attackConfig);
                 }
+            case "oriented_grayhole":
+            case "oriented_greyhole":
+                // Ataque uc09 portado da dev-carlos já na forma configurável;
+                // a versão legacy (parâmetros fixos) não foi trazida.
+                return new OrientedGrayHoleIEDC(benignIED, attackConfig);
             case "delayed_replay":
                 return useLegacy ? new DelayedReplayIED(benignIED) : new DelayedReplayIEDC(benignIED, attackConfig);
             case "delayed_replay_batch_dump":
