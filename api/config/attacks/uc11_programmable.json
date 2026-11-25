@@ -1,0 +1,20 @@
+{
+  "attackType": "programmable",
+  "description": "Programmable attack (UC11): declarative rules applied to copies of legitimate GOOSE messages",
+  "rules": {
+    "r0": {
+      "op": "add",
+      "field": "stNum",
+      "value": 5,
+      "fraction": 0.5,
+      "when": { "cmp": "always" }
+    },
+    "r1": {
+      "op": "add",
+      "field": "timestamp",
+      "value": 0.01,
+      "fraction": 0.2,
+      "when": { "field": "cbStatus", "cmp": "eq", "value": 1 }
+    }
+  }
+}

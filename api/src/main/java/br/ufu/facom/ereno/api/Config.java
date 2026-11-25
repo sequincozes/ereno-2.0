@@ -96,6 +96,17 @@ public final class Config {
      */
     public static HttpServer start(String bind, int port,
                                    Path configRoot, Path artifactsRoot, Path backupRoot) throws IOException {
+        HttpServer server = create(bind, port, configRoot, artifactsRoot, backupRoot);
+        server.start();
+        return server;
+    }
+
+    /**
+     * Builds the server with the config and artifact routes but does not start
+     * it, so {@link Server} can add the run routes first.
+     */
+    static HttpServer create(String bind, int port,
+                             Path configRoot, Path artifactsRoot, Path backupRoot) throws IOException {
         HttpServer server = HttpServer.create(new InetSocketAddress(bind, port), 0);
 
         server.createContext("/api/health", (HttpExchange ex) -> {
@@ -115,7 +126,6 @@ public final class Config {
             t.setDaemon(true);
             return t;
         }));
-        server.start();
         return server;
     }
 
@@ -229,6 +239,21 @@ public final class Config {
             }
         }
 
+        /** Streams a file without loading it into memory; datasets can be hundreds of MB. */
+        static void sendFile(HttpExchange ex, Path file, String contentType, String downloadName) throws IOException {
+            Headers h = ex.getResponseHeaders();
+            h.set("Content-Type", contentType);
+            if (downloadName != null) {
+                String ascii = downloadName.replaceAll("[^A-Za-z0-9._-]", "_");
+                h.set("Content-Disposition", "attachment; filename=\"" + ascii + "\"");
+            }
+            addCors(ex);
+            ex.sendResponseHeaders(200, Files.size(file));
+            try (OutputStream out = ex.getResponseBody()) {
+                Files.copy(file, out);
+            }
+        }
+
         static void sendJson(HttpExchange ex, int status, String json) throws IOException {
             sendBytes(ex, status, "application/json; charset=utf-8", json.getBytes(StandardCharsets.UTF_8));
         }
@@ -266,9 +291,9 @@ public final class Config {
             Headers h = ex.getResponseHeaders();
             String origin = System.getenv().getOrDefault("ERENO_API_CORS_ORIGIN", "http://localhost:5173");
             h.set("Access-Control-Allow-Origin", origin);
-            h.set("Access-Control-Allow-Methods", "GET,PUT,DELETE,OPTIONS");
+            h.set("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
             h.set("Access-Control-Allow-Headers", "Content-Type,If-Match,Authorization");
-            h.set("Access-Control-Expose-Headers", "ETag");
+            h.set("Access-Control-Expose-Headers", "ETag,Content-Disposition");
             h.set("Vary", "Origin");
         }
 

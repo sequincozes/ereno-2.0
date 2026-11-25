@@ -46,9 +46,21 @@ public class ActionRunner {
     private static final Logger LOGGER = Logger.getLogger(ActionRunner.class.getName());
 
     public static void main(String[] args) {
-        
+
+        if (args.length >= 1 && "serve".equals(args[0])) {
+            // HTTP API for the ERENO UI (configs, catalog, dataset runs).
+            try {
+                br.ufu.facom.ereno.api.Server.main(java.util.Arrays.copyOfRange(args, 1, args.length));
+            } catch (IOException e) {
+                LOGGER.severe("Could not start the API server: " + e.getMessage());
+                System.exit(2);
+            }
+            return;
+        }
+
         if (args.length < 1) {
             System.err.println("Usage: java -jar ERENO.jar <main-config.json>");
+            System.err.println("       java -jar ERENO.jar serve   (HTTP API for the ERENO UI)");
             System.err.println();
             System.err.println("Available actions:");
             System.err.println("  - create_benign: Generate benign (legitimate) traffic dataset");
