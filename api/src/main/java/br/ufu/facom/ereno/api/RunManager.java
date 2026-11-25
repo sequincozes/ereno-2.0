@@ -109,7 +109,10 @@ public final class RunManager {
         if (!jvmArgs.isEmpty()) {
             for (String a : jvmArgs.split("\\s+")) cmd.add(a);
         }
+        // run.log is read as UTF-8; Java 18+ writes stdout in the console code page unless told otherwise.
         cmd.add("-Dfile.encoding=UTF-8");
+        cmd.add("-Dstdout.encoding=UTF-8");
+        cmd.add("-Dstderr.encoding=UTF-8");
         cmd.add("-cp");
         cmd.add(System.getProperty("ereno.runner.classpath", System.getProperty("java.class.path")));
         cmd.add("br.ufu.facom.ereno.ActionRunner");
