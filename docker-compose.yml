@@ -1,0 +1,53 @@
+# ERENO in containers: backend (api/) + UI (app/, nginx).
+#   docker compose up --build          then open http://localhost:5173
+# Optional settings go in a .env next to this file (see .env.example).
+
+services:
+  api:
+    build:
+      context: ./api
+      args:
+        GIT_COMMIT: ${GIT_COMMIT:-unknown}
+    environment:
+      # Binding 0.0.0.0 inside the container requires a token. Only nginx (ui) knows it;
+      # the api port is not published to the host.
+      ERENO_API_TOKEN: ${ERENO_API_TOKEN:-ereno-local-token}
+      ERENO_WORKERS: ${ERENO_WORKERS:-1}
+      ERENO_RUNNER_JVM_ARGS: ${ERENO_RUNNER_JVM_ARGS:--Xmx4g}
+    volumes:
+      - ./api/electrical-sources:/app/electrical-sources:ro
+      - ./api/config:/app/config
+      - ereno-runs:/app/runs
+    healthcheck:
+      test: ["CMD", "curl", "-fs", "-o", "/dev/null", "http://127.0.0.1:8080/api/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+    restart: unless-stopped
+
+  ui:
+    build:
+      context: ./app
+      args:
+        VITE_AUTH_ENABLED: ${VITE_AUTH_ENABLED:-false}
+        VITE_APIKEY: ${VITE_APIKEY:-}
+        VITE_AUTHDOMAIN: ${VITE_AUTHDOMAIN:-}
+        VITE_DATABASEURL: ${VITE_DATABASEURL:-}
+        VITE_PROJECTID: ${VITE_PROJECTID:-}
+        VITE_STORAGEBUCKET: ${VITE_STORAGEBUCKET:-}
+        VITE_MESSAGINGSENDERID: ${VITE_MESSAGINGSENDERID:-}
+        VITE_APPID: ${VITE_APPID:-}
+        VITE_MEASUREMENTID: ${VITE_MEASUREMENTID:-}
+    environment:
+      ERENO_API_UPSTREAM: http://api:8080
+      ERENO_API_TOKEN: ${ERENO_API_TOKEN:-ereno-local-token}
+    ports:
+      # Loopback only by default; set ERENO_UI_BIND=0.0.0.0 to expose it on the network.
+      - "${ERENO_UI_BIND:-127.0.0.1}:${ERENO_UI_PORT:-5173}:80"
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  ereno-runs:

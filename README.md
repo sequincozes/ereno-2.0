@@ -27,6 +27,32 @@ The script builds the backend when its sources changed, installs the UI dependen
 
 Without an `app/.env`, the UI runs in local mode: no login, everything goes to the local backend. To enable Google login and the personal preset library, copy [`app/.env.example`](app/.env.example) to `app/.env` and fill in the Firebase settings.
 
+## Run with Docker
+
+Requirements: Docker with Compose v2. No Java or Node needed on the host.
+
+```bash
+docker compose up --build -d                                  # then open http://localhost:5173
+GIT_COMMIT=$(git rev-parse HEAD) docker compose up --build -d # records the commit in each run's manifest
+docker compose logs -f api                                    # backend log
+docker compose down                                           # stop (runs are kept in the ereno-runs volume)
+```
+
+- **`api`** is the core plus the HTTP API.
+  - `api/electrical-sources` is mounted read-only and `api/config` is mounted read/write.
+  - Runs live in the `ereno-runs` volume.
+  - Its port is not published to the host.
+- **`ui`** is nginx serving the built UI. It also proxies `/api` to the backend and adds the API token on the way. The token never reaches the browser, and the backend rejects requests without it.
+- The UI is published on `127.0.0.1:5173` only.
+
+Optional settings go in a `.env` next to `docker-compose.yml` (see [`.env.example`](.env.example)):
+- the token, the host/port of the UI, workers and `-Xmx` for each generation;
+- Firebase settings, which are baked into the UI at build time.
+
+Generation inside the container is slower on Windows/macOS because the electrical sources are read through a bind mount.
+
+Run datasets are byte-identical across Windows, Linux and the image for the same spec and seed: every generation process writes `\n` line endings.
+
 ## How a dataset is generated
 
 1. The UI walks through **IED → GOOSE flow → benign traffic → attacks → generate**. Its forms come from the backend's `GET /api/catalog`, which reads the core's own templates (`api/config/attacks/*.json`) and defaults (`api/config/actions/`). A new attack template therefore shows up in the UI without frontend changes.

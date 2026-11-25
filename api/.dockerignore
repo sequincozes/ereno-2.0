@@ -1,0 +1,7 @@
+target/
+runs/
+electrical-sources/
+debug.csv
+tools/
+*.iml
+.idea/

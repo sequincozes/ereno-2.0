@@ -113,6 +113,9 @@ public final class RunManager {
         cmd.add("-Dfile.encoding=UTF-8");
         cmd.add("-Dstdout.encoding=UTF-8");
         cmd.add("-Dstderr.encoding=UTF-8");
+        // The writers end rows with the platform separator; pin it so the same spec and
+        // seed give the same bytes on Windows, Linux and in the Docker image.
+        cmd.add("-Dline.separator=\n");
         cmd.add("-cp");
         cmd.add(System.getProperty("ereno.runner.classpath", System.getProperty("java.class.path")));
         cmd.add("br.ufu.facom.ereno.ActionRunner");
@@ -377,7 +380,15 @@ public final class RunManager {
                 StandardOpenOption.CREATE, StandardOpenOption.APPEND);
     }
 
+    /** The commit the manifest records: from git when available, else ERENO_GIT_COMMIT (set in the Docker image). */
     private static String readGitCommit(Path dir) {
+        String fromGit = gitHead(dir);
+        if (fromGit != null) return fromGit;
+        String env = System.getenv("ERENO_GIT_COMMIT");
+        return env == null || env.isBlank() || "unknown".equals(env) ? null : env.trim();
+    }
+
+    private static String gitHead(Path dir) {
         try {
             Process p = new ProcessBuilder("git", "rev-parse", "HEAD")
                     .directory(dir.toFile()).redirectErrorStream(true).start();

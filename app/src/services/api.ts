@@ -1,7 +1,9 @@
 import type { Catalog, FieldError, RunDetail, RunSpec, RunStatus } from '../types/run';
 
 // Single client for the ERENO backend (`java -jar ... serve`).
+// VITE_API_URL="/" means same origin (the Docker image, where nginx proxies /api).
 const BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8080').replace(/\/+$/, '');
+const API_LABEL = BASE_URL || 'this server (/api)';
 const TOKEN = import.meta.env.VITE_API_TOKEN || '';
 
 export class ApiError extends Error {
@@ -30,7 +32,7 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
       body: body === undefined ? undefined : JSON.stringify(body),
     });
   } catch {
-    throw new ApiError(0, `Cannot reach the ERENO API at ${BASE_URL}. Is the backend running?`);
+    throw new ApiError(0, `Cannot reach the ERENO API at ${API_LABEL}. Is the backend running?`);
   }
   if (res.status === 204) return undefined as T;
   const text = await res.text();

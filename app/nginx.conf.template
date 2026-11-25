@@ -1,0 +1,26 @@
+server {
+    listen 80;
+    server_name _;
+    root /usr/share/nginx/html;
+
+    # Backend API. The bearer token is added here and never shipped to the browser.
+    location /api/ {
+        proxy_pass ${ERENO_API_UPSTREAM};
+        proxy_set_header Authorization "Bearer ${ERENO_API_TOKEN}";
+        proxy_set_header Host $host;
+        client_max_body_size 4m;
+        # Datasets can be large: stream them instead of buffering to disk.
+        proxy_buffering off;
+        proxy_read_timeout 300s;
+    }
+
+    # Single-page app: unknown paths load index.html and the router takes over.
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    location /assets/ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+}
